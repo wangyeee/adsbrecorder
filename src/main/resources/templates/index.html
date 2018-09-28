@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <title>Live Data</title>
+    <link rel="stylesheet" href="/main.css" />
+</head>
+<body>
+    <div th:if="${islive == 'true'}">
+        <p th:text="${#dates.format(currtime, 'dd-MM-yyyy HH:mm')}"/>
+        <div id="react"></div>
+        <script src="built/liveb.js"></script>
+    </div>
+    <div th:if="${islive == 'false'}">
+        <h1>No RTL device connected</h1>
+    </div>
+</body>
+</html>

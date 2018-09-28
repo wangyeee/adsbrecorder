@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0"/>
+    <meta charset="utf-8"/>
+    <style>
+      #map {
+        height: 70%;
+        width: 100%;
+      }
+      #aircrafts {
+        height: 30%;
+        width: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <p id="flightNumber" style="display: none;" th:text="${flightNumber}"></p>
+    <p id="cenlati" style="display: none;" th:text="${cenlati}"></p>
+    <p id="cenlong" style="display: none;" th:text="${cenlong}"></p>
+    <div id="aircrafts">
+    <div id="details">
+    </div>
+    </div>
+	<script src="built/mapb.js"></script>
+  </body>
+</html>
