@@ -14,5 +14,4 @@ buildNumber.properties
 .classpath
 .project
 .settings/*
-air.xml
 node_modules/*
