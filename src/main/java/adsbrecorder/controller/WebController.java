@@ -1,12 +1,13 @@
 package adsbrecorder.controller;
 
 import static adsbrecorder.entity.Flight.isFlightNumber;
+import static java.util.Objects.requireNonNull;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ public class WebController {
 
     @Autowired
     public WebController(TrackingRecordService trackingRecordService) {
-        this.trackingRecordService = Objects.requireNonNull(trackingRecordService);
+        this.trackingRecordService = requireNonNull(trackingRecordService);
     }
 
     @GetMapping(value = {"/", "/live"})
@@ -33,10 +34,12 @@ public class WebController {
     }
 
     @GetMapping(value = "/map")
-    public String map(@RequestParam(value="f") String flightNumber, Model model) {
+    public String map(@RequestParam(value="f") String flightNumber,
+            @RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") Date date, Model model) {
         if (isFlightNumber(flightNumber)) {
             model.addAttribute("flightNumber", flightNumber);
-            List<TrackingRecord> records = trackingRecordService.getLiveTrack(flightNumber);
+            model.addAttribute("flightDate", date);
+            List<TrackingRecord> records = trackingRecordService.getTrackOn(flightNumber, date);
             if (records.isEmpty()) {
                 model.addAttribute("cenlati", 0);
                 model.addAttribute("cenlong", 0);

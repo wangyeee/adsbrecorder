@@ -91,6 +91,7 @@ class SimpleMap extends React.Component {
     constructor(props) {
         super(props);
         this.state = { flightNumber: document.getElementById('flightNumber').innerHTML,
+                       flightDate : document.getElementById('flightDate').innerHTML,
                        gmapKey: "",
                        rloc: {} };
         this.fetchLiveData = this.fetchLiveData.bind(this);
@@ -100,7 +101,7 @@ class SimpleMap extends React.Component {
     fetchLiveData() {
         client({ method: 'GET', path: '/api/gmap' }).done(response => {
             this.setState({ gmapKey: response.entity.key });
-            client({ method: 'GET', path: '/api/track?f=' + this.state.flightNumber }).done(response => {
+            client({ method: 'GET', path: '/api/' + this.state.flightNumber + '/' + this.state.flightDate }).done(response => {
                 this.trackingRecords = response.entity.filter((record) =>
                     record.latitude != 0 && record.longitude != 0).map((record) =>
                         <Aircraft
@@ -142,7 +143,7 @@ class SimpleMap extends React.Component {
                 </GoogleMapReact>
             );
         } else {
-            return (<p>Loading...</p>);
+            return (<p>Loading maps...</p>);
         }
     }
 }

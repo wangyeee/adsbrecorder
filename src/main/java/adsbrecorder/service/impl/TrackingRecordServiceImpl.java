@@ -1,5 +1,9 @@
 package adsbrecorder.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -127,9 +131,40 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
     }
 
     @Override
+    public List<TrackingRecord> getTrackBetween(String flightNumber, Date after, Date before) {
+        return recordRepo.findByFlightNumberInDateRange(flightNumber, after, before);
+    }
+
+    @Override
+    public List<TrackingRecord> getTrackBefore(String flightNumber, Date before) {
+        return recordRepo.findByFlightNumberInDateRange(flightNumber, new Date(0L), before);
+    }
+
+    @Override
+    public List<TrackingRecord> getTrackAfter(String flightNumber, Date after) {
+        return recordRepo.findByFlightNumberInDateRange(flightNumber, after, new Date());
+    }
+
+    @Override
+    public List<TrackingRecord> getTrackOn(String flightNumber, Date date) {
+        LocalDateTime start = LocalDateTime.of(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT);
+        LocalDateTime end = start.plusDays(1);
+        return recordRepo.findByFlightNumberInDateRange(flightNumber,
+                Date.from(start.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                Date.from(end.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+
+    @Override
     public List<TrackingRecord> getLiveTrack(String flightNumber) {
-        // TODO change days
-        return recordRepo.findByFlightNumber(flightNumber, new Date(System.currentTimeMillis() - 24 * 3600000L));
+        TrackingRecord t = latestRecords.get(flightNumber);
+        if (t != null) {
+            return getTrackOn(flightNumber, t.getRecordDate());
+        }
+        return Collections.emptyList();
+    }
+
+    public List<Date> findDatesWithFlight(String flightNumber, int page, int amount) {
+        return recordRepo.findDatesWithFlight(flightNumber, PageRequest.of(page, amount));
     }
 
     @Override

@@ -1,10 +1,11 @@
 package adsbrecorder.controller;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class AirlineController {
 
     @Autowired
     public AirlineController(AirlineService airlineService, FlightService flightService) {
-        this.airlineService = Objects.requireNonNull(airlineService);
-        this.flightService = Objects.requireNonNull(flightService);
+        this.airlineService = requireNonNull(airlineService);
+        this.flightService = requireNonNull(flightService);
         this.receiverLocation = null;
     }
 

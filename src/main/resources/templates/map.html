@@ -18,13 +18,17 @@
         margin: 0;
         padding: 0;
       }
+      .fe_param {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
-    <p id="flightNumber" style="display: none;" th:text="${flightNumber}"></p>
-    <p id="cenlati" style="display: none;" th:text="${cenlati}"></p>
-    <p id="cenlong" style="display: none;" th:text="${cenlong}"></p>
+    <p id="flightNumber" class="fe_param" th:text="${flightNumber}"></p>
+    <p id="flightDate" class="fe_param" th:text="${#dates.format(flightDate, 'yyyy-MM-dd')}"></p>
+    <p id="cenlati" class="fe_param" th:text="${cenlati}"></p>
+    <p id="cenlong" class="fe_param" th:text="${cenlong}"></p>
     <div id="aircrafts">
     <div id="details">
     </div>
