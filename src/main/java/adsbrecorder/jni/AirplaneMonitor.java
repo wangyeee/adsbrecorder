@@ -10,11 +10,14 @@ public class AirplaneMonitor extends Thread implements NewAircraftCallback {
     // is local RTL device found
     private boolean localReceiver;
 
+    private boolean biasTee;
+
     private Dump1090Native dump1090;
     private TrackingRecordService recordService;
 
-    public AirplaneMonitor(int deviceIndex, TrackingRecordService recordService) {
+    public AirplaneMonitor(int deviceIndex, TrackingRecordService recordService, boolean biasTee) {
         this.recordService = recordService;
+        this.biasTee = biasTee;
         dump1090 = Dump1090Native.getInstance(deviceIndex);
         if (dump1090 == null) {
             System.err.println("START: No RTL device found.");
@@ -35,6 +38,7 @@ public class AirplaneMonitor extends Thread implements NewAircraftCallback {
         if (localReceiver) {
             try {
                 if (dump1090 != null) {
+                    dump1090.setBiasTee(biasTee);
                     dump1090.startMonitor(this);
                 }
             } catch (IOException e) {
@@ -46,5 +50,9 @@ public class AirplaneMonitor extends Thread implements NewAircraftCallback {
 
     public boolean hasLocalReceiver() {
         return localReceiver;
+    }
+
+    public boolean isBiasTeeEnabled() {
+        return biasTee;
     }
 }

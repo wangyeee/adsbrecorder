@@ -17,7 +17,10 @@ public class Init {
 
     @Value("${adsbrecorder.rtl_device:0}") 
     private int rtlDeviceIndex;
-    
+
+    @Value("${adsbrecorder.rtl_bias_tee:false}") 
+    private boolean biasTee;
+
     private AirlineService airlineService;
 
     private TrackingRecordService recordService;
@@ -41,7 +44,7 @@ public class Init {
     }
     
     private void startMonitor() {
-        AirplaneMonitor t = new AirplaneMonitor(rtlDeviceIndex, recordService);
+        AirplaneMonitor t = new AirplaneMonitor(rtlDeviceIndex, recordService, biasTee);
         t.start();
     }
 

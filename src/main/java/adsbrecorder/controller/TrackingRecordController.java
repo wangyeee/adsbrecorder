@@ -3,7 +3,6 @@ package adsbrecorder.controller;
 import static adsbrecorder.entity.Flight.isFlightNumber;
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -67,8 +66,6 @@ public class TrackingRecordController {
             if (!records.isEmpty())
                 return records;
         }
-        List<TrackingRecord> empty = new ArrayList<TrackingRecord>(2);
-        empty.add(TrackingRecord.emptyRecord());
-        return empty;
+        return Collections.emptyList();
     }
 }

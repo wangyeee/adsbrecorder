@@ -54,5 +54,6 @@ public class Dump1090Native {
 
     public native void startMonitor(int devIndex, NewAircraftCallback callback) throws IOException;
     public native void stopMonitor() throws IOException;
+    public native void setBiasTee(boolean biasTee) throws IOException;
     public static native List<Integer> listAllReceivers() throws IOException;
 }

@@ -85,8 +85,8 @@ class Aircraft extends React.Component {
                 <td>{this.props.aircraft.flight.airline.country}</td>
                 <td>{this.props.aircraft.latitude}</td>
                 <td>{this.props.aircraft.longitude}</td>
-                <td>{this.props.aircraft.altitude + ' ft'}</td>
-                <td>{this.props.aircraft.velocity + ' kt'}</td>
+                <td>{(0.3048 * this.props.aircraft.altitude).toFixed(0) + ' m (' + this.props.aircraft.altitude + ' ft)'}</td>
+                <td>{(1.852 * this.props.aircraft.velocity).toFixed(2) + ' km/h (' + this.props.aircraft.velocity + ' kt)'}</td>
                 <td>{this.props.aircraft.heading}</td>
                 <td>{Geomath.displatKm(Geomath.calculateDistance(
                     Geomath.deg2rad(this.props.aircraft.latitude),
