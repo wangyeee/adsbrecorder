@@ -10,6 +10,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * A FlightAirlineRule class instance is to add rule defining
+ * relationship between a flight number and its airliner. By
+ * default, the relationship is established by searching alphabets
+ * in the callsign against airline IATA or ICAO codes.
+ * @author Ye Wang
+ */
 @Entity
 @Table(name = "AREC_FA_RULE")
 public class FlightAirlineRule implements Serializable {

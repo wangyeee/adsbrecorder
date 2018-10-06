@@ -1,5 +1,7 @@
 package adsbrecorder.service.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -7,7 +9,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
@@ -49,10 +50,10 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
     public TrackingRecordServiceImpl(TrackingRecordRepository recordRepo, FlightRepository flightRepo,
             FlightAirlineRuleRepository ruleRepo, AirlineRepository airlineRepo) {
         latestRecords = new ConcurrentHashMap<String, TrackingRecord>();
-        this.recordRepo = Objects.requireNonNull(recordRepo);
-        this.flightRepo = Objects.requireNonNull(flightRepo);
-        this.ruleRepo = Objects.requireNonNull(ruleRepo);
-        this.airlineRepo = Objects.requireNonNull(airlineRepo);
+        this.recordRepo = requireNonNull(recordRepo);
+        this.flightRepo = requireNonNull(flightRepo);
+        this.ruleRepo = requireNonNull(ruleRepo);
+        this.airlineRepo = requireNonNull(airlineRepo);
     }
 
     @Scheduled(fixedDelay = 10000) // 10s
@@ -77,9 +78,11 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
         TrackingRecord prev = latestRecords.get(flightNumber);
         if (!record.tooClose(prev)) {
             System.out.println(record);
+            // First check if the same flight number has been recorded before
             Flight f = flightRepo.findByFlightNumber(flightNumber);
             if (f == null) {
                 f = new Flight();
+                // Check if there is any pre-defined rule against the flight number
                 FlightAirlineRule rule = ruleRepo.findByFlightNumber(flightNumber);
                 Airline a;
                 if (rule == null) {
@@ -88,8 +91,10 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
                         if (flightNumber.charAt(i) >= '0' && flightNumber.charAt(i) <= '9')
                             break;
                     }
+                    // ABC123 -> ABC, search 'ABC' in airline table
                     a = airlineRepo.findByIATAorICAO(flightNumber.substring(0, i));
                     if (a == null) {
+                        // Giveup...
                         a = new Airline();
                         a.setCountry("ZZ");
                         a.setICAO(flightNumber.substring(0, i));
@@ -113,9 +118,11 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
 
     @Override
     public TrackingRecord latestRecord(String flightNumber) {
+        // Try to find in cache first
         TrackingRecord t = latestRecords.get(flightNumber);
         if (t != null)
             return t;
+        // then search the database
         t = recordRepo.findLatestByFlightNumber(flightNumber);
         return t;
     }

@@ -1,6 +1,6 @@
 package adsbrecorder.lc;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,8 +27,8 @@ public class Init {
 
     @Autowired
     public Init(AirlineService airlineService, TrackingRecordService recordService) {
-        this.airlineService = Objects.requireNonNull(airlineService);
-        this.recordService = Objects.requireNonNull(recordService);
+        this.airlineService = requireNonNull(airlineService);
+        this.recordService = requireNonNull(recordService);
     }
 
     private void loadAirlineData() {

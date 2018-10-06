@@ -1,7 +1,8 @@
 package adsbrecorder.service.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +19,7 @@ public class FlightServiceImpl implements FlightService {
 
     @Autowired
     public FlightServiceImpl(FlightRepository flightRepo) {
-        this.flightRepo = Objects.requireNonNull(flightRepo);
+        this.flightRepo = requireNonNull(flightRepo);
     }
 
     @Override

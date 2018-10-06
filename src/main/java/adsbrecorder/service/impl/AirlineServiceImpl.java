@@ -1,9 +1,10 @@
 package adsbrecorder.service.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,7 +29,7 @@ public class AirlineServiceImpl implements AirlineService {
 
     @Autowired
     public AirlineServiceImpl(CrudRepository<Airline, Long> airlineRepo) {
-        this.airlineRepo = Objects.requireNonNull(airlineRepo);
+        this.airlineRepo = requireNonNull(airlineRepo);
     }
 
     @Override
@@ -44,6 +45,9 @@ public class AirlineServiceImpl implements AirlineService {
         airlineRepo.save(dft);
     }
 
+    /**
+     * Import data from <a href="https://en.wikipedia.org/wiki/List_of_airline_codes">https://en.wikipedia.org/wiki/List_of_airline_codes</a>
+     */
     @Override
     public void loadKnownAirlines() {
         List<Airline> airlines = new ArrayList<Airline>();
@@ -67,8 +71,6 @@ public class AirlineServiceImpl implements AirlineService {
                     air.setIATA(e.getElementsByTagName("IATA").item(0).getTextContent());
                     air.setICAO(e.getElementsByTagName("ICAO").item(0).getTextContent());
                     airlines.add(air);
-
-                    //if (airlines.size() > 10) break;  // test only
                 }
             }
             System.out.println(list.getLength() + " records loaded.");
