@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import adsbrecorder.jni.AirplaneMonitor;
 import adsbrecorder.service.AirlineService;
+import adsbrecorder.service.MilitaryCallsignService;
 import adsbrecorder.service.TrackingRecordService;
 
 @Component
@@ -25,10 +26,13 @@ public class Init {
 
     private TrackingRecordService recordService;
 
+    private MilitaryCallsignService milCallsignService;
+
     @Autowired
-    public Init(AirlineService airlineService, TrackingRecordService recordService) {
+    public Init(AirlineService airlineService, TrackingRecordService recordService, MilitaryCallsignService milCallsignService) {
         this.airlineService = requireNonNull(airlineService);
         this.recordService = requireNonNull(recordService);
+        this.milCallsignService = requireNonNull(milCallsignService);
     }
 
     private void loadAirlineData() {
@@ -40,6 +44,7 @@ public class Init {
             System.out.println("loading airline data.");
             airlineService.loadKnownAirlines();
         }
+        milCallsignService.loadMilitaryCallsignData();
         System.out.println("Airline data loaded.");
     }
     
