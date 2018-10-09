@@ -1,14 +1,23 @@
 package adsbrecorder.service.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Scanner;
+import static java.util.Objects.requireNonNull;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +26,13 @@ import adsbrecorder.repo.MilitaryCallsignRepository;
 import adsbrecorder.service.MilitaryCallsignService;
 
 @Service
-public class MilitaryCallsignServiceImpl implements MilitaryCallsignService {
+public class MilitaryCallsignServiceImpl implements MilitaryCallsignService, RecordConsumer {
 
     private MilitaryCallsignRepository repo;
 
     @Autowired
     public MilitaryCallsignServiceImpl(MilitaryCallsignRepository repo) {
+        this();
         this.repo = repo;
     }
 
@@ -34,97 +44,177 @@ public class MilitaryCallsignServiceImpl implements MilitaryCallsignService {
         return MilitaryCallsign.emptyRecord();
     }
 
+    private boolean isMilitaryCallsignDataExist() {
+        return repo.count() > 0L;
+    }
+
+    private File downloadFile(String url) throws IOException {
+        File tmp = File.createTempFile("MIL_", ".pdf");
+        FileOutputStream out = new FileOutputStream(tmp);
+        ReadableByteChannel inChannel = Channels.newChannel(new URL(url).openStream());
+        out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+        out.flush();
+        out.close();
+        inChannel.close();
+        return tmp;
+    }
+
     @Override
-    public void loadMilitaryCallsignData() {
-        File txt = new File("MilitaryCallsigns.txt");
-        File unsolved = new File("MilitaryCallsignsNew.txt");
-        Scanner sn = null;
-        PrintWriter out = null;
-        final char SEPARATOR = ' ';
-        final int BUF_SIZE = 1000;
+    public synchronized void loadMilitaryCallsignData() {
+        File pdf = null;
+        PDDocument document = null;
+        if (isMilitaryCallsignDataExist())
+            return;
         try {
-            sn = new Scanner(txt);
-            if (unsolved.exists())
-                unsolved.delete();
-            unsolved.createNewFile();
-            out = new PrintWriter(unsolved);
-            String line = null;
-            String country = null;
-            MilitaryCallsign[] calls = new MilitaryCallsign[BUF_SIZE];
-            int i = 0;
-            while (sn.hasNextLine()) {
-                line = sn.nextLine().trim();
-                if (line.charAt(0) == '#' || line.startsWith("maandag") || line.startsWith("Callsign"))
-                    continue;
-                if (line.startsWith("Country")) {
-                    country = WordUtils.capitalizeFully(line.substring("Country".length()).trim());
-                    continue;
-                }
-                String[] d = StringUtils.split(line, SEPARATOR);
-                if (d.length == 3 || line.charAt(line.length() - 1) == '-' || line.contains("|")) {
-                    MilitaryCallsign call = new MilitaryCallsign();
-                    call.setCountry(country);
-                    call.setCallsign(d[0]);
-                    if (d.length == 3) {
-                        call.setType(d[1]);
-                        call.setUnit(d[2]);
-                    } else if (line.charAt(line.length() - 1) == '-') {
-                        StringBuilder sb = new StringBuilder();
-                        for (int j = 1; j < d.length - 1; j++) {
-                            sb.append(d[j]);
-                            sb.append(SEPARATOR);
-                        }
-                        call.setType(sb.toString().substring(0, sb.length() - 1));
-                        call.setUnit(d[d.length - 1]);
-                    } else {
-                        int s = search(d, "|");
-                        if (s > 0) {
-                            StringBuilder type = new StringBuilder();
-                            for (int k = 1; k < s - 1; k++) {
-                                type.append(d[k]);
-                                type.append(' ');
-                            }
-                            StringBuilder unit = new StringBuilder();
-                            for (int k = s - 1; k < d.length; k++) {
-                                unit.append(d[k]);
-                                unit.append(' ');
-                            }
-                            call.setType(type.toString().substring(0, type.length() - 1));
-                            call.setUnit(unit.toString().substring(0, unit.length() - 1));
-                        }
-                    }
-                    calls[i] = call;
-                    i++;
-                    if (i == BUF_SIZE) {
-                        repo.saveAll(Arrays.asList(calls));
-                        System.err.println("Save batch callsigns");
-                        i = 0;
-                    }
-                } else {
-                    out.println(String.format("%s\t%s", country, line.replaceFirst(" ", "\t")));
-                }
+            MilCallDataParser parser = new MilCallDataParser(this);
+            pdf = downloadFile(PDF_URL);
+            PDFTextStripper stripper = PositionTextStripper.newInstance(parser);
+            document = PDDocument.load(pdf);
+            stripper.setSortByPosition(true);
+            stripper.setStartPage(0);
+            stripper.setEndPage(document.getNumberOfPages());
+            Writer dummy = new OutputStreamWriter(new ByteArrayOutputStream());
+            stripper.writeText(document, dummy);
+            dummy.close();
+            if (curr > 0) {
+                repo.saveAll(Arrays.asList(Arrays.copyOf(batch, curr)));
             }
-            if (i != 0) {
-                repo.saveAll(Arrays.asList(Arrays.copyOf(calls, i)));
-                System.err.println("Save final batch callsigns: " + i);
-            }
-            out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (sn != null)
-                sn.close();
-            if (out != null)
-                out.close();
+            try {
+                if (document != null)
+                    document.close();
+                if (pdf != null && pdf.exists())
+                    pdf.delete();
+            } catch (IOException e) {
+                // ignore
+            }
         }
     }
 
-    int search(String[] array, String chr) {
-        for (int i = 0; i < array.length; i++) {
-            String s = array[i];
-            if (s.equals(chr))
-                return i;
+    private final int batchSize = 1000;
+    private MilitaryCallsign[] batch;
+    private int curr;
+
+    protected MilitaryCallsignServiceImpl() {
+        curr = 0;
+        batch = new MilitaryCallsign[batchSize];
+    }
+
+    @Override
+    public void newRecord(MilitaryCallsign record) {
+        if (curr < batchSize) {
+            batch[curr] = record;
+            curr++;
+        } else {
+            repo.saveAll(Arrays.asList(batch));
+            curr = 0;
         }
-        return -1;
+    }
+}
+
+class PositionTextStripper extends PDFTextStripper {
+
+    private MilCallDataParser parser;
+
+    public PositionTextStripper() throws IOException {
+        super();
+    }
+
+    public static PositionTextStripper newInstance(MilCallDataParser parser) {
+        try {
+            PositionTextStripper s = new PositionTextStripper();
+            s.parser = requireNonNull(parser);
+            return s;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void writeString(String string, List<TextPosition> textPositions) throws IOException {
+        StringBuilder line = new StringBuilder();
+        for (TextPosition text : textPositions) {
+            line.append(text.getUnicode());
+        }
+        parser.addNewLine(line.toString());
+    }
+}
+
+interface RecordConsumer {
+    void newRecord(MilitaryCallsign record);
+}
+
+class MilCallDataParser {
+
+    public static final String DATE_PREFIX = "maandag";
+    public static final String PAGE_PREFIX = "Pagina";
+
+    public static final String MILITARY_CALLSIGNS = "Military Callsigns";
+    public static final String COUNTRY = "Country";
+    public static final String CALLSIGN = "Callsign";
+    public static final String TYPE = "Type";
+    public static final String UNIT = "Unit";
+
+    private String currentCountry;
+
+    private String callsign;
+    private String type;
+    private String unit;
+
+    private boolean setCountry;
+
+    private int step;
+
+    private RecordConsumer dest;
+
+    public MilCallDataParser(RecordConsumer dest) throws IOException {
+        setCountry = false;
+        step = 0;
+        this.dest = requireNonNull(dest);
+    }
+
+    public void addNewLine(String line) {
+        if (MILITARY_CALLSIGNS.equalsIgnoreCase(line))
+            return;
+        if (COUNTRY.equalsIgnoreCase(line)) {
+            setCountry = true;
+            return;
+        }
+        if (setCountry) {
+            if (CALLSIGN.equalsIgnoreCase(line)) {
+                setCountry = false;
+            } else {
+                currentCountry = line;
+            }
+            return;
+        }
+        if (TYPE.equalsIgnoreCase(line) || UNIT.equalsIgnoreCase(line))
+            return;
+        if (line.startsWith(DATE_PREFIX) || line.startsWith(PAGE_PREFIX))
+            return;
+        switch (step) {
+        case 0:
+            callsign = line;
+            step++;
+            break;
+        case 1:
+            type = line;
+            step++;
+            break;
+        case 2:
+            unit = line;
+            step = 0;
+            MilitaryCallsign c = new MilitaryCallsign();
+            c.setCallsign(callsign);
+            c.setCountry(currentCountry);
+            c.setType(type);
+            c.setUnit(unit);
+            dest.newRecord(c);;
+            break;
+        default:
+            throw new RuntimeException("Invalid step: " + step);
+        }
     }
 }
