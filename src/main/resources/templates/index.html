@@ -7,12 +7,17 @@
 </head>
 <body>
     <div th:if="${islive == 'true'}">
-        <p th:text="${#dates.format(currtime, 'dd-MM-yyyy HH:mm')}"/>
+        <p th:text="${#dates.format(currtime, 'dd-MM-yyyy')}"/>
         <div id="react"></div>
         <script src="built/liveb.js"></script>
     </div>
     <div th:if="${islive == 'false'}">
         <h1>No RTL device connected</h1>
+    </div>
+    <div>
+        <h2>History records</h2>
+        <div id="histbl"></div>
+        <script src="built/histb.js"></script>
     </div>
 </body>
 </html>

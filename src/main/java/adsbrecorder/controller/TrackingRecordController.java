@@ -27,6 +27,23 @@ public class TrackingRecordController {
         this.trackingRecordService = requireNonNull(trackingRecordService);
     }
 
+    @GetMapping("/api/dates")
+    public List<Date> listDatesWithFlights(@RequestParam(value="p", defaultValue = "0") String page,
+            @RequestParam(value="n", defaultValue = "5") String amount) {
+        int p, n;
+        try {
+            p = Integer.parseInt(page.replace('-', '?'));
+        } catch (NumberFormatException e) {
+            p = 0;
+        }
+        try {
+            n = Integer.parseInt(amount.replace('-', '?'));
+        } catch (NumberFormatException e) {
+            n = 5;
+        }
+        return trackingRecordService.findDatesWithAnyFlight(p, n);
+    }
+
     @GetMapping("/api/{f}/{dt}")
     public List<TrackingRecord> historyOn(@PathVariable(value="f") String flightNumber,
             @PathVariable(value = "dt") @DateTimeFormat(pattern="yyyy-MM-dd") Date on) {

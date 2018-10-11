@@ -17,6 +17,7 @@ public interface TrackingRecordService {
     List<TrackingRecord> getTrackOn(String flightNumber, Date date);
     List<TrackingRecord> getTrackBefore(String flightNumber, Date before);
     List<TrackingRecord> getTrackAfter(String flightNumber, Date after);
+    List<Date> findDatesWithAnyFlight(int page, int amount);
     List<Date> findDatesWithFlight(String flightNumber, int page, int amount);
     void setLocalReceiver(boolean receiver);
     boolean hasLocalReceiver();

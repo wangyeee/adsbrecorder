@@ -170,6 +170,12 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
         return Collections.emptyList();
     }
 
+    @Override
+    public List<Date> findDatesWithAnyFlight(int page, int amount) {
+        return recordRepo.findDatesWithAnyFlight(PageRequest.of(page, amount));
+    }
+
+    @Override
     public List<Date> findDatesWithFlight(String flightNumber, int page, int amount) {
         return recordRepo.findDatesWithFlight(flightNumber, PageRequest.of(page, amount));
     }

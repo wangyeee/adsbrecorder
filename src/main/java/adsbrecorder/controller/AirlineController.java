@@ -3,6 +3,7 @@ package adsbrecorder.controller;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,9 @@ import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -82,7 +85,28 @@ public class AirlineController {
         return this.receiverLocation;
     }
 
-    @GetMapping("/api/flights")
+    @GetMapping("/api/flights/{dt}")
+    public List<Flight> listFlights(@PathVariable(value = "dt") @DateTimeFormat(pattern="yyyy-MM-dd") Date date,
+            @RequestParam(value="p", defaultValue = "0") String pageStr,
+            @RequestParam(value="n", defaultValue = "5") String amountStr) {
+        int amount;
+        int page;
+        try {
+            amount = Integer.parseInt(amountStr);
+        } catch (NumberFormatException e) {
+            amount = 5;
+        }
+        if (amount <= 0)
+            amount = 5;
+        try {
+            page = Integer.parseInt(pageStr);
+        } catch (NumberFormatException e) {
+            page = 0;
+        }
+        return flightService.findOnDate(date, page, amount);
+    }
+
+    @GetMapping("/api/allflights")
     public List<Flight> listFlights(@RequestParam(value="n", defaultValue = "5") String amountStr) {
         int amount;
         try {

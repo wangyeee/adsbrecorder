@@ -30,6 +30,9 @@ public class WebController {
     public String index(Model model) {
         model.addAttribute("currtime", new Date());
         model.addAttribute("islive", Boolean.toString(trackingRecordService.hasLocalReceiver()));
+        if (!trackingRecordService.hasLocalReceiver()) {
+            model.addAttribute("dates", trackingRecordService.findDatesWithAnyFlight(0, 10));
+        }
         return "index";
     }
 

@@ -22,13 +22,18 @@ public interface TrackingRecordRepository extends JpaRepository<TrackingRecord, 
     @Query("select t from TrackingRecord t join t.flight f where f.flightNumber = :fn and t.recordDate between :start and :end")
     List<TrackingRecord> findByFlightNumberInDateRange(@Param("fn") String flightNumber, @Param("start") Date startDate, @Param("end") Date endDate);
 
-    @Query(value = "select distinct date(rec.record_date) " + 
-            "from arec_record rec, " + 
-            "arec_flight flt " + 
-            "where rec.record_flight = flt.flight_id " + 
-            "and flt.flight_number = :fn " + 
+    @Query(value = "select distinct date(rec.record_date) " +
+            "from arec_record rec, " +
+            "arec_flight flt " +
+            "where rec.record_flight = flt.flight_id " +
+            "and flt.flight_number = :fn " +
             "order by rec.record_date desc", nativeQuery = true)
     List<Date> findDatesWithFlight(@Param("fn") String flightNumber, Pageable limit);
+
+    @Query(value = "select distinct date(rec.record_date) " +
+            "from arec_record rec " +
+            "order by rec.record_date desc", nativeQuery = true)
+    List<Date> findDatesWithAnyFlight(Pageable limit);
 
     default Date lastFoundOn(String flightNumber) {
         List<Date> found = findDatesWithFlight(flightNumber, PageRequest.of(0, 1));
