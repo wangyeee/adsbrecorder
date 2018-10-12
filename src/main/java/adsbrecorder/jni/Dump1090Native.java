@@ -9,16 +9,25 @@ public class Dump1090Native {
 
     private static Map<Integer, Dump1090Native> instances;
 
+    private static boolean nativeLibraryLoaded;
+
     static {
-        System.loadLibrary("dump1090");
         try {
-            List<Integer> devs = listAllReceivers();
-            instances = new HashMap<>();
-            for (Integer index : devs) {
-                instances.put(index, new Dump1090Native(index));
+            System.loadLibrary("dump1090");
+            nativeLibraryLoaded = true;
+        } catch (UnsatisfiedLinkError t) {
+            nativeLibraryLoaded = false;
+        }
+        if (nativeLibraryLoaded) {
+            try {
+                List<Integer> devs = listAllReceivers();
+                instances = new HashMap<>();
+                for (Integer index : devs) {
+                    instances.put(index, new Dump1090Native(index));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -35,6 +44,8 @@ public class Dump1090Native {
     }
 
     public static Dump1090Native getInstance(int index) {
+        if (!nativeLibraryLoaded)
+            return null;
         Dump1090Native obj = instances.get(index);
         if (obj != null) {
             if (obj.inUse != 0)
