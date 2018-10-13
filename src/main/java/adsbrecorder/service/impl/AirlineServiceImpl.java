@@ -2,7 +2,8 @@ package adsbrecorder.service.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,8 +52,9 @@ public class AirlineServiceImpl implements AirlineService {
     @Override
     public void loadKnownAirlines() {
         List<Airline> airlines = new ArrayList<Airline>();
+        InputStream xml = null;
         try {
-            File xml = new File("air.xml");
+            xml = this.getClass().getClassLoader().getResourceAsStream("air.xml");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(xml);
@@ -76,6 +78,12 @@ public class AirlineServiceImpl implements AirlineService {
             System.out.println(list.getLength() + " records loaded.");
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if (xml != null)
+                    xml.close();
+            } catch (IOException e) {
+            }
         }
         airlineRepo.saveAll(airlines);
     }
