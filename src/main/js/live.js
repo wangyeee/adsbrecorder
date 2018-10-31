@@ -51,20 +51,20 @@ class AircraftList extends React.Component {
                 aircraft => <Aircraft key={aircraft.recordID} aircraft={aircraft} rloc={this.props.rloc}/>
         );
         return (
-                <table>
+                <table className="table table-striped">
                 <thead>
                 <tr>
-                <th>Flight Number</th>
-                <th>Airline</th>
-                <th>Airline Country</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Altitude</th>
-                <th>Velocity</th>
-                <th>Heading</th>
-                <th>Distance</th>
-                <th>View Track</th>
-                <th>Update on</th>
+                <th scope="col">Flight Number</th>
+                <th scope="col">Airline</th>
+                <th scope="col">Airline Country</th>
+                <th scope="col">Latitude</th>
+                <th scope="col">Longitude</th>
+                <th scope="col">Altitude</th>
+                <th scope="col">Velocity</th>
+                <th scope="col">Heading</th>
+                <th scope="col">Distance</th>
+                <th scope="col">View Track</th>
+                <th scope="col">Update on</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -95,7 +95,7 @@ class Aircraft extends React.Component {
                     Geomath.deg2rad(this.props.rloc.lati),
                     Geomath.deg2rad(this.props.rloc.long),
                     this.props.rloc.alti * 1.0))}</td>
-                <td><a target="_blank" href={'/map?f=' + this.props.aircraft.flight.flightNumber}>View</a></td>
+                <td><a target="_blank" href={'/map?f=' + this.props.aircraft.flight.flightNumber + '&date=' + new Date().toISOString().slice(0, 10)}>View</a></td>
                 <td><Time value={new Date(this.props.aircraft.recordDate)} format="DD/MM/YYYY HH:mm:ss" /></td>
             </tr>
         );

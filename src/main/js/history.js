@@ -23,11 +23,11 @@ class FlightHistoryListTable extends React.Component {
             date => <FlightHistoryCell key={date} date={date}/>
         );
         return (
-            <table>
+            <table className="table table-striped">
                 <thead>
                     <tr>
-                        <td>Date</td>
-                        <td>View</td>
+                        <td scope="col">Date</td>
+                        <td scope="col">View</td>
                     </tr>
                 </thead>
                 <tbody>

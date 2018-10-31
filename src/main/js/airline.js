@@ -30,20 +30,22 @@ class AirlineList extends React.Component {
                 airline => <Airline key={airline.airlineID} airline={airline}/>
         );
         return (
-                <table>
-                <thead>
-                <tr>
-                <th>Name</th>
-                <th>Call Sign</th>
-                <th>ICAO</th>
-                <th>IATA</th>
-                <th>Country</th>
-                </tr>
-                </thead>
-                <tbody>
-                {airlines}
-                </tbody>
+            <div className="row">
+                <table className="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Call Sign</th>
+                            <th scope="col">ICAO</th>
+                            <th scope="col">IATA</th>
+                            <th scope="col">Country</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {airlines}
+                    </tbody>
                 </table>
+            </div>
         );
     }
 }
