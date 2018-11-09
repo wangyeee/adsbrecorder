@@ -6,15 +6,19 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import adsbrecorder.entity.TrackingRecord;
+import adsbrecorder.jni.Aircraft;
 import adsbrecorder.service.TrackingRecordService;
 
 @RestController
@@ -84,5 +88,24 @@ public class TrackingRecordController {
                 return records;
         }
         return Collections.emptyList();
+    }
+
+    @PostMapping("/api/remote")
+    public Map<String, String> addRecords(@RequestBody List<Aircraft> aircrafts, @RequestParam(value="k") String sessionKey) {
+        if (verifySessionKey(sessionKey)) {
+            int x = 0;
+            for (Aircraft aircraft : aircrafts) {
+                TrackingRecord t = new TrackingRecord(aircraft);
+                trackingRecordService.addRecord(t);
+                if (t.getRecordID() != null)
+                    x++;
+            }
+            return Map.of("code", "0", "new_records", String.valueOf(x));
+        }
+        return Map.of("code", "1", "message", "invalid session key");
+    }
+
+    private boolean verifySessionKey(String sessionKey) {
+        return true;
     }
 }
