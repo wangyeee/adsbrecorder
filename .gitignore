@@ -16,3 +16,4 @@ buildNumber.properties
 .settings/*
 node_modules/*
 src/main/resources/static/built/*
+application.properties
