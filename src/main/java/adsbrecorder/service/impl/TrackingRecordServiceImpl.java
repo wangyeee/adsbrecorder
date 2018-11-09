@@ -77,7 +77,6 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
         }
         TrackingRecord prev = latestRecords.get(flightNumber);
         if (!record.tooClose(prev)) {
-            System.out.println(record);
             // First check if the same flight number has been recorded before
             Flight f = flightRepo.findByFlightNumber(flightNumber);
             if (f == null) {
@@ -103,7 +102,6 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
                         airlineRepo.save(a);
                     }
                 } else {
-                    System.err.println("Using pre-defined flight number rule: " + rule);
                     a = rule.getAirline();
                 }
                 f.setFlightNumber(flightNumber);
