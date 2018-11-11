@@ -91,21 +91,14 @@ public class TrackingRecordController {
     }
 
     @PostMapping("/api/remote")
-    public Map<String, String> addRecords(@RequestBody List<Aircraft> aircrafts, @RequestParam(value="k") String sessionKey) {
-        if (verifySessionKey(sessionKey)) {
-            int x = 0;
-            for (Aircraft aircraft : aircrafts) {
-                TrackingRecord t = new TrackingRecord(aircraft);
-                trackingRecordService.addRecord(t);
-                if (t.getRecordID() != null)
-                    x++;
-            }
-            return Map.of("code", "0", "new_records", String.valueOf(x));
+    public Map<String, String> addRecords(@RequestBody List<Aircraft> aircrafts) {
+        int x = 0;
+        for (Aircraft aircraft : aircrafts) {
+            TrackingRecord t = new TrackingRecord(aircraft);
+            trackingRecordService.addRecord(t);
+            if (t.getRecordID() != null)
+                x++;
         }
-        return Map.of("code", "1", "message", "invalid session key");
-    }
-
-    private boolean verifySessionKey(String sessionKey) {
-        return true;
+        return Map.of("code", "0", "new_records", String.valueOf(x));
     }
 }
