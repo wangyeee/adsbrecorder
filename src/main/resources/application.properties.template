@@ -25,3 +25,6 @@ adsbrecorder.google_map_key=## Google Maps API key ##
 adsbrecorder.receiver_loc_lati=0.0 ## Latitude of the receiver
 adsbrecorder.receiver_loc_long=0.0 ## Longitude of the receiver
 adsbrecorder.receiver_loc_alti=10  ## Altitude of the, unit: meter
+adsbrecorder.client.sha_key=## Base64 encoded signing key ##
+adsbrecorder.client.issuer=adsb-server
+adsbrecorder.client.valid_period=86400000
