@@ -87,6 +87,11 @@ public class TrackingRecord implements Serializable {
         recordDate = new Date();
     }
 
+    public TrackingRecord(Aircraft a, long time) {
+        this(a);
+        recordDate = new Date(time);
+    }
+
     public TrackingRecord(Aircraft a) {
         this();
         flight = new Flight();

@@ -40,7 +40,7 @@ public class AuthController {
             long now = System.currentTimeMillis();
             return Map.of("token", Jwts.builder()
                     .setIssuer(issuer)
-                    .setAudience(receiver.getRemoteReceiverName())
+                    .setSubject(receiver.getRemoteReceiverName())
                     .setIssuedAt(new Date(now))
                     .setExpiration(new Date(now + validPeriod))
                     .setId(UUID.randomUUID().toString())

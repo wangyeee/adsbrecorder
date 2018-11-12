@@ -92,14 +92,14 @@ public class TrackingRecordController {
 
     @GetMapping("/remote/cfg")
     public Map<String, String> test(@RequestParam(value = "p", required = false) String param) {
-        return Map.of("", String.valueOf(param));
+        return Map.of("resp", String.valueOf(param));
     }
 
     @PostMapping("/remote/add")
     public Map<String, String> addRecords(@RequestBody List<Aircraft> aircrafts) {
         int x = 0;
         for (Aircraft aircraft : aircrafts) {
-            TrackingRecord t = new TrackingRecord(aircraft);
+            TrackingRecord t = new TrackingRecord(aircraft, aircraft.getLastTimeSeen() * 1000L);  // convert from s to ms
             trackingRecordService.addRecord(t);
             if (t.getRecordID() != null)
                 x++;
