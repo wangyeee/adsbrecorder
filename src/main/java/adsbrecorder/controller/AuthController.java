@@ -10,15 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import adsbrecorder.entity.RemoteReceiver;
 import adsbrecorder.service.AuthService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 
 @RestController
@@ -52,20 +48,6 @@ public class AuthController {
                     .compact().toString());
         }
         return Map.of("message", "Authentication failure");
-    }
-
-    // test only
-    @PostMapping("/api/jwt")
-    public Map<String, String> sign(@RequestBody Map<String, Object> claims) {
-        String jws = authService.sign(claims).compact();
-        return Map.of("token", jws);
-    }
-
-    // test only
-    @GetMapping("/api/par")
-    public Map<String, Object> parser(@RequestParam(name = "token") String jwt) {
-        Jws<Claims> jws = authService.parser(jwt);
-        return Map.of("decode", jws);
     }
 
     // test only

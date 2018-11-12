@@ -58,7 +58,7 @@ public class TrackingRecordController {
     }
 
     @GetMapping("/api/{f}/latest")
-    public TrackingRecord latestTrackingRecord(@PathVariable(value="f") String flightNumber) {
+    public TrackingRecord latestTrackingRecord(@PathVariable(value = "f") String flightNumber) {
         if (isFlightNumber(flightNumber)) {
             TrackingRecord t = trackingRecordService.latestRecord(flightNumber);
             if (t != null)
@@ -68,7 +68,7 @@ public class TrackingRecordController {
     }
 
     @GetMapping("/api/{f}/history")
-    public List<TrackingRecord> allHistory(@PathVariable(value="f") String flightNumber,
+    public List<TrackingRecord> allHistory(@PathVariable(value = "f") String flightNumber,
             @RequestParam(value="p", defaultValue = "0") String page,
             @RequestParam(value="n", defaultValue = "5") String amount) {
         if (isFlightNumber(flightNumber)) {
@@ -90,7 +90,12 @@ public class TrackingRecordController {
         return Collections.emptyList();
     }
 
-    @PostMapping("/api/remote")
+    @GetMapping("/remote/cfg")
+    public Map<String, String> test(@RequestParam(value = "p", required = false) String param) {
+        return Map.of("", String.valueOf(param));
+    }
+
+    @PostMapping("/remote/add")
     public Map<String, String> addRecords(@RequestBody List<Aircraft> aircrafts) {
         int x = 0;
         for (Aircraft aircraft : aircrafts) {
