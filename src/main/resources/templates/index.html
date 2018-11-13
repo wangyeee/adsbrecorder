@@ -11,13 +11,10 @@
 </head>
 <body>
     <div class="container">
-        <div th:if="${islive == 'true'}" class="row">
+        <div>
             <h2>Live Data</h2>
             <div id="react"></div>
             <script src="built/liveb.js"></script>
-        </div>
-        <div th:if="${islive == 'false'}" class="row">
-            <h1>No RTL device connected</h1>
         </div>
         <div>
             <h2>History records</h2>

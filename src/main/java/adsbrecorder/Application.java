@@ -12,7 +12,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAutoConfiguration
 @EnableScheduling
 @EnableJpaRepositories(basePackages = "adsbrecorder.repo")
-@ComponentScan(basePackages = {"adsbrecorder.lc", "adsbrecorder.service", "adsbrecorder.controller", "adsbrecorder.auth"})
+@ComponentScan(basePackages = {"adsbrecorder", "adsbrecorder.lc",
+        "adsbrecorder.service", "adsbrecorder.controller",
+        "adsbrecorder.auth"})
 @EntityScan(basePackages = "adsbrecorder.entity")
 public class Application {
     public static void main(String[] args) {
