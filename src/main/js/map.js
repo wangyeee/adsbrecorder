@@ -15,44 +15,37 @@ class AircraftDetails extends React.Component {
 
     render() {
         return (
-            <table>
-                <tbody>
-                    <tr>
-                        <td>Flight:</td>
-                        <td>{this.props.flight.flightNumber}</td>
-                    </tr>
-                    <tr>
-                        <td>Airline:</td>
-                        <td>{this.props.flight.airline.name}</td>
-                    </tr>
-                    <tr>
-                        <td>Altitude:</td>
-                        <td>{this.props.alti + ' feet'}</td>
-                    </tr>
-                    <tr>
-                        <td>Heading:</td>
-                        <td>{this.props.hdrg + ' DEG'}</td>
-                    </tr>
-                    <tr>
-                        <td>Velocity:</td>
-                        <td>{this.props.velocity + ' knots'}</td>
-                    </tr>
-                    <tr>
-                        <td>Time:</td>
-                        <td><Time value={new Date(this.props.recordDate)} format="DD/MM/YYYY HH:mm:ss" /></td>
-                    </tr>
-                    <tr>
-                        <td>Distance:</td>
-                        <td>{Geomath.displatKm(Geomath.calculateDistance(
-                            Geomath.deg2rad(this.props.lati),
-                            Geomath.deg2rad(this.props.long),
-                            Geomath.feet2meters(this.props.alti),
-                            Geomath.deg2rad(this.props.rloc.lati),
-                            Geomath.deg2rad(this.props.rloc.long),
-                            this.props.rloc.alti * 1.0))}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div>
+                <div>
+                    <p class="h5">{this.props.flight.flightNumber + ' (' + this.props.flight.airline.name + ')'}</p>
+                </div>
+                <table className="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Altitude</th>
+                            <th scope="col">Heading</th>
+                            <th scope="col">Velocity</th>
+                            <th scope="col">Time</th>
+                            <th scope="col">Distance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{this.props.alti + ' feet'}</td>
+                            <td>{this.props.hdrg + ' DEG'}</td>
+                            <td>{this.props.velocity + ' knots'}</td>
+                            <td><Time value={new Date(this.props.recordDate)} format="DD/MM/YYYY HH:mm:ss" /></td>
+                            <td>{Geomath.displatKm(Geomath.calculateDistance(
+                                Geomath.deg2rad(this.props.lati),
+                                Geomath.deg2rad(this.props.long),
+                                Geomath.feet2meters(this.props.alti),
+                                Geomath.deg2rad(this.props.rloc.lati),
+                                Geomath.deg2rad(this.props.rloc.long),
+                                this.props.rloc.alti * 1.0))}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         );
     }
 }
