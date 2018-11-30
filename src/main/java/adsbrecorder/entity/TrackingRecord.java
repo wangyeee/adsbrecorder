@@ -263,7 +263,7 @@ public class TrackingRecord implements Serializable {
         this.recordDate = recordDate;
     }
 
-    public long getLastSeenPeriod() {
+    public long calculateLastSeenPeriod() {
         return System.currentTimeMillis() - recordDate.getTime();
     }
 

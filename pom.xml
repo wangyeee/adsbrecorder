@@ -3,14 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <groupId>adsbrecorder</groupId>
   <artifactId>adsb-recorder</artifactId>
-  <packaging>jar</packaging>
+  <!-- <packaging>jar</packaging> -->
+  <packaging>war</packaging>
   <version>1.0</version>
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.0.3.RELEASE</version>
+    <version>2.1.0.RELEASE</version>
   </parent>
 
   <dependencies>
@@ -42,8 +43,7 @@
     <dependency>
       <groupId>javax.persistence</groupId>
       <artifactId>javax.persistence-api</artifactId>
-      <version>2.2</version>
-    </dependency>
+      </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
@@ -60,7 +60,7 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.8</version>
+      <version>0.9.10</version>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
@@ -123,10 +123,11 @@
   </repositories>
 
   <properties>
-    <java.version>9</java.version>
+    <java.version>11</java.version>
   </properties>
 
   <build>
+    <finalName>ROOT</finalName>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
