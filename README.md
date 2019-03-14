@@ -2,8 +2,8 @@
 An application saves ADSB data from RTL SDR to local database for further analysis.
 
 ## Prerequisites
-1. You need to setup a RTL SDR device on a Linux machine, the wiki [here](https://osmocom.org/projects/rtl-sdr/wiki/Rtl-sdr) is a good start point.
-2. JDK and Maven. This application is developed in openjdk-9, which is the latest version in Debian Stretch.
+1. You need to setup a RTL SDR device on a Linux machine, the wiki [here](https://osmocom.org/projects/rtl-sdr/wiki/Rtl-sdr) is a good start point. OR run with remote receiver, which is in this [repo](https://github.com/wangyeee/adsbreceiver). If you choose remote receiver, then the JNI library will no longer be needed on the server side.
+2. JDK and Maven. This application is developed in openjdk-11, which is the latest version in Debian Stretch.
 3. ~~MySQL~~ MariaDB to store recorded data. Create an empty database and update application.properties with connection strings and credentials.
 
 ## Build and Run
