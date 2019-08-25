@@ -1,0 +1,92 @@
+{
+    "roles": [
+        {
+            "roleName": "ADMIN",
+            "displayName": "Administrator",
+            "description": ""
+        },
+        {
+            "roleName": "FEEDER",
+            "displayName": "Normal user",
+            "description": ""
+        },
+        {
+            "roleName": "REPORT_USER",
+            "displayName": "Report user",
+            "description": ""
+        }
+    ],
+    "users" : [
+        {
+            "username" : "Admin",
+            "password" : "Admin"
+        }
+    ],
+    "userRoles" : [
+        {
+            "user" : "Admin",
+            "roles" : [
+                "ADMIN",
+                "REPORT_USER",
+                "FEEDER"
+            ]
+        }
+    ],
+    "authorities" : [
+        {
+            "authority" : "ADD_TRACKING_RECORD",
+            "displayName" : "Add tracking record",
+            "description" : ""
+        },
+        {
+            "authority" : "RUN_SIMPLE_DAILY_SUMMARY_REPORT",
+            "displayName" : "Run simple daily summary report",
+            "description" : ""
+        },
+        {
+            "authority" : "VIEW_REPORT_METADATA",
+            "displayName" : "View report metadata",
+            "description" : ""
+        },
+        {
+            "authority" : "WRITE_REMOTE_RECEIVER",
+            "displayName" : "Create or Update remote receiver",
+            "description" : ""
+        },
+        {
+            "authority" : "USER_CRUD",
+            "displayName" : "Create, Update or Delete user",
+            "description" : ""
+        },
+        {
+            "authority" : "ROLE_CRUD",
+            "displayName" : "Create, Update or Delete role",
+            "description" : ""
+        }
+    ],
+    "roleAuthorities" : [
+        {
+            "role" : "ADMIN",
+            "authorities" : [
+                "ADD_TRACKING_RECORD",
+                "WRITE_REMOTE_RECEIVER",
+                "USER_CRUD",
+                "ROLE_CRUD"
+            ]
+        },
+        {
+            "role" : "REPORT_USER",
+            "authorities" : [
+                "RUN_SIMPLE_DAILY_SUMMARY_REPORT",
+                "VIEW_REPORT_METADATA"
+            ]
+        },
+        {
+            "role" : "FEEDER",
+            "authorities" : [
+                "ADD_TRACKING_RECORD",
+                "WRITE_REMOTE_RECEIVER"
+            ]
+        }
+    ]
+}

@@ -4,17 +4,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>adsbrecorder</groupId>
-  <artifactId>services</artifactId>
+  <artifactId>common</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>Common</module>
-    <module>UserService</module>
-    <module>ClientService</module>
-    <module>ReceiverService</module>
-    <module>DataService</module>
-    <module>RealtimeService</module>
-    <module>BackgroundServices</module>
+    <module>aop</module>
+    <module>data</module>
+    <module>exception</module>
+    <module>kafka</module>
+    <module>security</module>
+    <module>utils</module>
   </modules>
 </project>

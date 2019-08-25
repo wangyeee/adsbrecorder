@@ -1,0 +1,23 @@
+{
+  "user": {
+    "userId": 267905,
+    "username": "Admin",
+    "password": "8d99a1594535d582547d98b068446bfb42cbd47d91d9f9bf3de476903dcd193fba2760b0f1a74c4cf696150112f02bbe50bf63f9e5ce8f385374393ceb4ad304",
+    "creationDate": "2019-07-15T07:20:20.000+0000",
+    "roles": [
+      {
+        "roleId": 267903,
+        "roleName": "ADMIN",
+        "displayName": "Administrator",
+        "description": ""
+      },
+      {
+        "roleId": 267904,
+        "roleName": "FEEDER",
+        "displayName": "Normal user",
+        "description": ""
+      }
+    ]
+  },
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJVU0VSX1NFUlZJQ0UxIiwic3ViIjoiQWRtaW4iLCJpYXQiOjE1NjM0MjY0NDUsImV4cCI6MTU2MzUxMjg0NSwianRpIjoiMmFiZjZkOWItOGI3Ni00OWFlLTg4MWItMjQ2N2M3NDY2NDE4In0.YPku_Gatu493TWUU-_MgHOoDHCCFBgoJJVVGSTLQQSg"
+}
