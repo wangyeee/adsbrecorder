@@ -1,0 +1,6 @@
+server.port=8085
+debug=true
+
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+adsbrecorder.inactive_retention=60000

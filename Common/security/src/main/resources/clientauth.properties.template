@@ -1,0 +1,3 @@
+adsbrecorder.client.sha_key=# key in base64
+adsbrecorder.client.issuer=adsb-server
+adsbrecorder.client.valid_period=86400000
