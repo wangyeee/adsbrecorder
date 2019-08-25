@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -12,8 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,59 +58,50 @@ public class ClientController implements ClientServiceMappings {
                 .body(Map.of("message", String.format("Client name %s is already used", name)));
     }
 
-    @RequireLogin
+    @RequireOwnership
     @GetMapping(CLIENT_UPDATE_KEY)
-    public ResponseEntity<Map<String, String>> getRemoteReceiverKey(
-            @PathVariable("client") Long remoteReceiverID) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.loginHash(String.valueOf(auth.getPrincipal()),
-                String.valueOf(auth.getCredentials()));
+    public ResponseEntity<Map<String, String>> getRemoteReceiverKey(@PathVariable("client")
+            @CheckOwnership(validator = RemoteReceiverOwnershipChecker.class) Long remoteReceiverID) {
         RemoteReceiver receiver = receiverService.findRemoteReceiver(remoteReceiverID);
-        if (user.getUserId().equals(receiver.getOwner().getUserId())) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(Map.of(
-                            "remoteReceiverKey", StringUtils.defaultString(receiver.getRemoteReceiverKey()),
-                            "remoteReceiverID", Long.toString(remoteReceiverID)));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", String.format("Remote receiver %d not found.", remoteReceiverID)));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of(
+                        "remoteReceiverKey", StringUtils.defaultString(receiver.getRemoteReceiverKey()),
+                        "remoteReceiverID", Long.toString(remoteReceiverID)));
     }
 
-    @RequireLogin
+    @RequireOwnership
+    @PutMapping(CLIENT_UPDATE_KEY)
+    public ResponseEntity<RemoteReceiver> regenerateReceiverKey(@PathVariable("client")
+            @CheckOwnership(validator = RemoteReceiverOwnershipChecker.class) Long remoteReceiverID) {
+        RemoteReceiver receiver = receiverService.findRemoteReceiver(remoteReceiverID);
+        receiver.setRemoteReceiverKey(UUID.randomUUID().toString());
+        receiver = receiverService.updateRemoteReceiver(receiver);
+        receiver.setOwner(null);  // reduce response size
+        return ResponseEntity.status(HttpStatus.OK).body(receiver);
+    }
+
+    @RequireOwnership
     @GetMapping(CLIENT_UPDATE_DESCRIPTION)
-    public ResponseEntity<Map<String, String>> getRemoteReceiverDescription(
-            @PathVariable("client") Long remoteReceiverID) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.loginHash(String.valueOf(auth.getPrincipal()),
-                String.valueOf(auth.getCredentials()));
+    public ResponseEntity<Map<String, String>> getRemoteReceiverDescription(@PathVariable("client")
+            @CheckOwnership(validator = RemoteReceiverOwnershipChecker.class) Long remoteReceiverID) {
         RemoteReceiver receiver = receiverService.findRemoteReceiver(remoteReceiverID);
-        if (user.getUserId().equals(receiver.getOwner().getUserId())) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(Map.of(
-                            "description", StringUtils.defaultString(receiver.getDescription()),
-                            "remoteReceiverID", Long.toString(remoteReceiverID)));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", String.format("Remote receiver %d not found.", remoteReceiverID)));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of(
+                        "description", StringUtils.defaultString(receiver.getDescription()),
+                        "remoteReceiverID", Long.toString(remoteReceiverID)));
     }
 
+    @RequireOwnership
     @PutMapping(CLIENT_UPDATE_DESCRIPTION)
-    public ResponseEntity<Map<String, String>> updateRemoteReceiver(
-            @PathVariable("client") Long remoteReceiverID,
+    public ResponseEntity<Map<String, String>> updateRemoteReceiver(@PathVariable("client")
+            @CheckOwnership(validator = RemoteReceiverOwnershipChecker.class) Long remoteReceiverID,
             @RequestParam(name = "desc", required = true) String description) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.loginHash(String.valueOf(auth.getPrincipal()),
-                String.valueOf(auth.getCredentials()));
         RemoteReceiver receiver = receiverService.findRemoteReceiver(remoteReceiverID);
-        if (user.getUserId().equals(receiver.getOwner().getUserId())) {
-            receiver.setDescription(StringEscapeUtils.escapeHtml(description));
-            receiver = receiverService.updateRemoteReceiver(receiver);
-            return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-                    "description", StringUtils.defaultString(receiver.getDescription()),
-                    "remoteReceiverID", Long.toString(remoteReceiverID)));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", String.format("Remote receiver %d not found.", remoteReceiverID)));
+        receiver.setDescription(StringEscapeUtils.escapeHtml(description));
+        receiver = receiverService.updateRemoteReceiver(receiver);
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                "description", StringUtils.defaultString(receiver.getDescription()),
+                "remoteReceiverID", Long.toString(remoteReceiverID)));
     }
 
     @PutMapping(CLIENT_UPDATE)
@@ -133,16 +123,18 @@ public class ClientController implements ClientServiceMappings {
                 .collect(Collectors.toList());
     }
 
+    @RequireOwnership(allowOverride = true)
     @DeleteMapping(CLIENT_REMOVAL)
-    public ResponseEntity<Map<String, String>> removeRemoteReceiver(@PathVariable("client") @CheckOwnership Long receiverID) {
+    public ResponseEntity<Map<String, String>> removeRemoteReceiver(@PathVariable("client")
+            @CheckOwnership(validator = RemoteReceiverOwnershipChecker.class) Long receiverID) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("message", String.format("RemoteReceiver#%d has been removed", receiverID)));
     }
 
     @RequireOwnership
     @GetMapping(CLIENT_EXPORT)
-    public ResponseEntity<RemoteReceiver> exportRemoteReceiverDetails(
-            @PathVariable("client") @CheckOwnership(validator = RemoteReceiverOwnershipChecker.class) Long receiverID) {
+    public ResponseEntity<RemoteReceiver> exportRemoteReceiverDetails(@PathVariable("client")
+            @CheckOwnership(validator = RemoteReceiverOwnershipChecker.class) Long receiverID) {
         RemoteReceiver receiver = receiverService.findRemoteReceiver(receiverID);
         receiver.setOwner(null);
         return ResponseEntity.status(HttpStatus.OK).body(receiver);

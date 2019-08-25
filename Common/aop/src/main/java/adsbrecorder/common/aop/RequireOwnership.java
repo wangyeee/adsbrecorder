@@ -11,4 +11,5 @@ import java.lang.annotation.Target;
 public @interface RequireOwnership {
 //    @AliasFor("value")
 //    boolean checkLatestCredentials() default true;
+    boolean allowOverride() default false;
 }
