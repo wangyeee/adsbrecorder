@@ -27,6 +27,7 @@ import adsbrecorder.client.entity.RemoteReceiver;
 import adsbrecorder.client.service.RemoteReceiverService;
 import adsbrecorder.client.service.impl.RemoteReceiverOwnershipChecker;
 import adsbrecorder.common.aop.CheckOwnership;
+import adsbrecorder.common.aop.LoginUser;
 import adsbrecorder.common.aop.RequireLogin;
 import adsbrecorder.common.aop.RequireOwnership;
 import adsbrecorder.user.entity.User;
@@ -44,11 +45,11 @@ public class ClientController implements ClientServiceMappings {
         this.userService = requireNonNull(userService);
     }
 
+    @RequireLogin
     @PostMapping(CLIENT_NEW)
     public ResponseEntity<Map<String, Object>> addRemoteReceiver(
             @RequestParam(name = "name", required = true) String name,
-            @RequestParam(name = "user", required = true) String username) {
-        User owner = userService.findUserByName(username);
+            @LoginUser User owner) {
         RemoteReceiver receiver = receiverService.createRemoteReceiver(name, owner);
         if (receiver.toAuthenticationToken().isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.CREATED)
