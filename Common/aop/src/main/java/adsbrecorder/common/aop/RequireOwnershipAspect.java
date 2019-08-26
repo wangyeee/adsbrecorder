@@ -2,8 +2,6 @@ package adsbrecorder.common.aop;
 
 import static java.util.Objects.requireNonNull;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,20 +57,14 @@ public class RequireOwnershipAspect implements AnnotationUtils {
         Signature s = joinPoint.getSignature();
         if (s instanceof MethodSignature) {
             final MethodSignature signature = (MethodSignature) s;
-            Method method = signature.getMethod();
             Object[] parameterValues = joinPoint.getArgs();
-            Annotation[][] parameterAnnotations = method.getParameterAnnotations();
             Object id = null;
             OwnershipValidator validator = null;
-            for (int i = 0; i < parameterAnnotations.length; i++) {
-                // loop through all parameters to find CheckOwnership annotation
-                Annotation[] annotations = parameterAnnotations[i];
-                CheckOwnership paramAnnotation = filterAnnotationByType(annotations, CheckOwnership.class);
-                if (paramAnnotation != null) {
-                    id = parameterValues[i];
-                    validator = this.cachedOwnershipValidators.get(paramAnnotation.validator());
-                    break;
-                }
+            int index[] = new int[1];
+            CheckOwnership paramAnnotation = searchFirst(signature, CheckOwnership.class, index);
+            if (paramAnnotation != null) {
+                id = parameterValues[index[0]];
+                validator = this.cachedOwnershipValidators.get(paramAnnotation.validator());
             }
             if (id == null) {
                 // TODO log
