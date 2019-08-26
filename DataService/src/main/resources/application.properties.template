@@ -1,4 +1,4 @@
 server.port=8084
 debug=true
 
-adsbrecorder.google_map_key=#google maps api key
+adsbrecorder.google_map_key=CHANGEME

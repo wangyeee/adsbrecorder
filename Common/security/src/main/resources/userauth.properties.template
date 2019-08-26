@@ -1,4 +1,4 @@
 adsbrecorder.userservice.saltlength=16
-adsbrecorder.userservice.sha_key=# key in base64
+adsbrecorder.userservice.sha_key=CHANGEME
 adsbrecorder.userservice.issuer=USER_SERVICE1
 adsbrecorder.userservice.valid_period=86400000
