@@ -1,6 +1,7 @@
 package adsbrecorder.reporting.service;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import adsbrecorder.reporting.entity.ReportJob;
@@ -13,4 +14,5 @@ public interface ReportService {
     ReportJob runSimpleDailySummaryReport(String reportName, String reportType, Map<String, Object> parameters, User submittedBy);
     ReportJob getById(BigInteger id, User owner);
     ReportJob getById(BigInteger id);
+    List<ReportJob> getRecentReportJobs(User owner, int amount);
 }

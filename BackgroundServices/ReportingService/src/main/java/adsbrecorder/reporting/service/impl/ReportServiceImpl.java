@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -67,5 +68,10 @@ public class ReportServiceImpl implements ReportService {
         if (job.isEmpty())
             throw new ReportJobNotFoundException(id);
         return job.get();
+    }
+
+    @Override
+    public List<ReportJob> getRecentReportJobs(User owner, int amount) {
+        return this.reportJobRepository.findRecentJobsByUser(owner.getUserId(), amount);
     }
 }

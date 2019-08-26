@@ -33,7 +33,8 @@ public class ReportAuthenticationAdapter extends TokenAuthenticationAdapter impl
     protected Map<String, String> hasAnyAuthorityURLs() {
         return Map.of(
                 SIMPLE_DAILY_SUMMARY_REPORT, RUN_SIMPLE_DAILY_SUMMARY_REPORT,
-                VIEW_REPORT_OUTPUT, RUN_SIMPLE_DAILY_SUMMARY_REPORT,  // TODO modify
+                VIEW_REPORT_OUTPUT, RUN_SIMPLE_DAILY_SUMMARY_REPORT,  // TODO create new authority
+                VIEW_RECENT_REPORT_JOBS, RUN_SIMPLE_DAILY_SUMMARY_REPORT,  // TODO create new authority
                 GET_REPORT_PROGRESS, VIEW_REPORT_METADATA);
     }
 }
