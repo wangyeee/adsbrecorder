@@ -28,7 +28,7 @@ import adsbrecorder.user.service.UserService;
 
 @Aspect
 @Component
-public class RequireOwnershipAspect {
+public class RequireOwnershipAspect implements AnnotationUtils {
 
     private UserService userService;
     private ApplicationContext applicationContext;
@@ -99,16 +99,5 @@ public class RequireOwnershipAspect {
             throw new AuthorizationExpiredException();
         }
         return user;
-    }
-
-    private static <T extends Annotation> T filterAnnotationByType(Annotation[] annotations, Class<T> clazz) {
-        for (Annotation annotation : annotations) {
-            if (clazz.isAssignableFrom(annotation.getClass())) {
-                @SuppressWarnings("unchecked")
-                T result = (T) annotation;
-                return result;
-            }
-        }
-        return null;
     }
 }

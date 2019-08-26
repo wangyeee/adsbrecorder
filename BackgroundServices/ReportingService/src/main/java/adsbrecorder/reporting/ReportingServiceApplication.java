@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan(basePackages = {
         "adsbrecorder.reporting",
         "adsbrecorder.common.aop",
+        "adsbrecorder.common.aop.conf",
         "adsbrecorder.reporting.controller",
         "adsbrecorder.reporting.service",
         "adsbrecorder.receiver.service",

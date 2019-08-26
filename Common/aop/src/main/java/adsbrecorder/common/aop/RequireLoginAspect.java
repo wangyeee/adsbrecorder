@@ -17,7 +17,7 @@ import adsbrecorder.user.service.UserService;
 
 @Aspect
 @Component
-public class RequireLoginAspect {
+public class RequireLoginAspect implements AnnotationUtils {
 
     private UserService userService;
 
@@ -31,11 +31,22 @@ public class RequireLoginAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         RequireLogin annotation = signature.getMethod().getAnnotation(RequireLogin.class);
         if (annotation.checkLatestCredentials()) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User user = userService.loginHash(String.valueOf(auth.getPrincipal()),
-                    String.valueOf(auth.getCredentials()));
-            if (user == null) {
-                throw new AuthorizationExpiredException();
+            int index[] = new int[1];
+            LoginUser anno = searchFirst(signature, LoginUser.class, index);
+            if (anno == null) {
+                // no User parameter injected to controller method
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                User user = userService.loginHash(String.valueOf(auth.getPrincipal()),
+                        String.valueOf(auth.getCredentials()));
+                if (user == null) {
+                    throw new AuthorizationExpiredException();
+                }
+            } else {
+                // Get user from value resolved by LoginUserArgumentResolver
+                Object[] parameterValues = joinPoint.getArgs();
+                Object user = parameterValues[index[0]];
+                if (user == null || (!(user instanceof User)))
+                    throw new AuthorizationExpiredException();
             }
         }
     }
