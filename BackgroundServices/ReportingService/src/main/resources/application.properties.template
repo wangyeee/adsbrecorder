@@ -1,8 +1,8 @@
 server.port=8086
 
-adsbrecorder.report.data_root=# root folder for data files
-adsbrecorder.report.output_root=# root folder for report output files
-adsbrecorder.report.tmpl_root=# root folder for report template files
-adsbrecorder.report.fop.conf=# path to fop.xconf
+adsbrecorder.report.data_root=CHANGEME
+adsbrecorder.report.output_root=CHANGEME
+adsbrecorder.report.tmpl_root=CHANGEME
+adsbrecorder.report.fop.conf=CHANGEME
 
 debug=true
