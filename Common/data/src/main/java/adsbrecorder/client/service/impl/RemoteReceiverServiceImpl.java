@@ -25,17 +25,18 @@ public class RemoteReceiverServiceImpl implements RemoteReceiverService {
     }
 
     @Override
-    public RemoteReceiver createRemoteReceiver(String name, User owner) {
+    public RemoteReceiver createRemoteReceiver(String name, String description, User owner) {
         if (remoteReceiverRepository.findOneByRemoteReceiverName(name).isPresent())
             return RemoteReceiver.unAuthorizedReceiver();
         RemoteReceiver receiver = new RemoteReceiver();
         receiver.setRemoteReceiverName(name);
         receiver.setOwner(owner);
+        receiver.setDescription(description);
         receiver.setRemoteReceiverKey(UUID.randomUUID().toString());
-        remoteReceiverRepository.save(receiver);
-        return receiver;
+        return remoteReceiverRepository.save(receiver);
     }
 
+    @Override
     public RemoteReceiver findRemoteReceiver(Long id) {
         Optional<RemoteReceiver> receiver = remoteReceiverRepository.findById(id);
         if (receiver.isPresent())

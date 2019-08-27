@@ -49,8 +49,9 @@ public class ClientController implements ClientServiceMappings {
     @PostMapping(CLIENT_NEW)
     public ResponseEntity<Map<String, Object>> addRemoteReceiver(
             @RequestParam(name = "name", required = true) String name,
+            @RequestParam(name = "desc", required = false) String description,
             @LoginUser User owner) {
-        RemoteReceiver receiver = receiverService.createRemoteReceiver(name, owner);
+        RemoteReceiver receiver = receiverService.createRemoteReceiver(name, description, owner);
         if (receiver.toAuthenticationToken().isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of("receiver", receiver));
