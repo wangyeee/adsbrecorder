@@ -11,4 +11,5 @@ public interface RemoteReceiverService {
     RemoteReceiver findRemoteReceiver(Long id);
     RemoteReceiver findRemoteReceiver(String name);
     List<RemoteReceiver> findByOwner(User user);
+    void removeRemoteReceiver(RemoteReceiver receiver);
 }

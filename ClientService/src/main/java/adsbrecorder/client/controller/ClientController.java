@@ -129,6 +129,8 @@ public class ClientController implements ClientServiceMappings {
     @DeleteMapping(CLIENT_REMOVAL)
     public ResponseEntity<Map<String, String>> removeRemoteReceiver(@PathVariable("client")
             @CheckOwnership(validator = RemoteReceiverOwnershipChecker.class) Long receiverID) {
+        RemoteReceiver receiver = receiverService.findRemoteReceiver(receiverID);
+        receiverService.removeRemoteReceiver(receiver);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("message", String.format("RemoteReceiver#%d has been removed", receiverID)));
     }

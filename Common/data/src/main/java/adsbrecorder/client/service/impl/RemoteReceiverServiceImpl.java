@@ -69,4 +69,11 @@ public class RemoteReceiverServiceImpl implements RemoteReceiverService {
     public List<RemoteReceiver> findByOwner(User user) {
         return remoteReceiverRepository.findAllByOwner(user);
     }
+
+    @Override
+    public void removeRemoteReceiver(RemoteReceiver receiver) {
+        if (receiver.getRemoteReceiverID() > 0L) {
+            remoteReceiverRepository.delete(receiver);
+        }
+    }
 }
