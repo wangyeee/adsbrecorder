@@ -1,0 +1,13 @@
+{
+    "sbs1cfg": {
+        "host": "localhost",
+        "port": 12345
+    },
+    "adsbcfg": {
+        "name": "<receiver name>",
+        "key": "<receiver key>",
+        "loginEP": "http://localhost:8081/api/client/login",
+        "trEP": "http://localhost:8083/api/receiver/record/new",
+        "vuEP": "http://localhost:8083/api/receiver/velo/new"
+    }
+}
