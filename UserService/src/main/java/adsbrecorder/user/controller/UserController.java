@@ -6,6 +6,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import adsbrecorder.common.auth.ListOfAudiences;
+import adsbrecorder.common.auth.TokenAuthenticationFilter;
 import adsbrecorder.user.UserServiceMappings;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.service.UserService;
@@ -62,23 +66,29 @@ public class UserController implements UserServiceMappings, ListOfAudiences {
     @PostMapping(USER_LOGIN)
     public ResponseEntity<Map<String, Object>> userLogin(
             @RequestParam(value = "username", required = true) String username,
-            @RequestParam(value = "password", required = true) String password) {
+            @RequestParam(value = "password", required = true) String password,
+            @RequestParam(value = "cookie", required = false, defaultValue = "true") boolean setCookie,
+            HttpServletResponse response) {
         User user = userService.login(username, password);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Username and password mismatch."));
         }
         long now = System.currentTimeMillis();
-        return ResponseEntity.status(HttpStatus.OK).body(
-                Map.of("user", user,
-                       "token", Jwts.builder()
-                       .setIssuer(issuer)
-                       .setAudience(USER)
-                       .setSubject(user.getUsername())
-                       .setIssuedAt(new Date(now))
-                       .setExpiration(new Date(now + validPeriod))
-                       .setId(UUID.randomUUID().toString())
-                       .signWith(userService.getSecretSigningKey())
-                       .compact().toString()));
+        String token = Jwts.builder()
+                .setIssuer(issuer)
+                .setAudience(USER)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + validPeriod))
+                .setId(UUID.randomUUID().toString())
+                .signWith(userService.getSecretSigningKey())
+                .compact().toString();
+        System.err.println("cookie? " + setCookie);
+        if (setCookie) {
+            Cookie cookie = TokenAuthenticationFilter.generateAuthenticationCookie(token);
+            response.addCookie(cookie);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("user", user, "token", token));
     }
 }

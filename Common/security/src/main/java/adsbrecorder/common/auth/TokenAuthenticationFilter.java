@@ -5,6 +5,7 @@ import java.security.Key;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,29 +18,51 @@ import io.jsonwebtoken.Jwts;
 
 public abstract class TokenAuthenticationFilter extends OncePerRequestFilter {
 
+    private final static String jwtCookieName = "JWT-AUTH";
+
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.replace("Bearer ", "");
-            try {
-                Claims claims = Jwts.parser()
-                        .setSigningKey(this.getSigningKey())
-                        .parseClaimsJws(token)
-                        .getBody();
-                Authentication authToken = this.tryAuthenticate(claims);
-                if (authToken.isAuthenticated()) {
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            } catch (Exception e) {
-                e.printStackTrace(); // TODO syserr
-                SecurityContextHolder.clearContext();
-            }
+        if (header == null) {
+             Cookie[] cookies = request.getCookies();
+             if (cookies!= null) {
+                 for (Cookie cookie : cookies) {
+                     if (jwtCookieName.equals(cookie.getName())) {
+                         authenticateToken(cookie.getValue());
+                         break;
+                     }
+                 }
+             }
+        } else if (header.startsWith("Bearer ")) {
+            authenticateToken(header.replace("Bearer ", ""));
         }
         chain.doFilter(request, response);
+    }
+
+    private void authenticateToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(this.getSigningKey())
+                    .parseClaimsJws(token)
+                    .getBody();
+            Authentication authToken = this.tryAuthenticate(claims);
+            if (authToken.isAuthenticated()) {
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // TODO syserr
+            SecurityContextHolder.clearContext();
+        }
     }
 
     protected abstract Authentication tryAuthenticate(Claims claims);
 
     protected abstract Key getSigningKey();
+
+    public final static Cookie generateAuthenticationCookie(String token) {
+        Cookie cookie = new Cookie(jwtCookieName, token);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/api");
+        return cookie;
+    }
 }
