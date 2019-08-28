@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import adsbrecorder.common.aop.LoginUser;
+import adsbrecorder.common.aop.RequireLogin;
 import adsbrecorder.common.auth.ListOfAudiences;
 import adsbrecorder.common.auth.TokenAuthenticationFilter;
 import adsbrecorder.user.UserServiceMappings;
@@ -63,6 +65,17 @@ public class UserController implements UserServiceMappings, ListOfAudiences {
                 "exist", Boolean.toString(usernameExist)));
     }
 
+    /**
+     * Restore login user instance from JWT token
+     * @param user the login user instance resolved by <code>adsbrecorder.common.aop.LoginUserArgumentResolver</code>
+     * @return the login user as <code>org.springframework.http.ResponseEntity</code>
+     */
+    @RequireLogin
+    @GetMapping(USER_LOGIN)
+    public ResponseEntity<Map<String, Object>> userLoginFromJWT(@LoginUser User user) {
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("user", user));
+    }
+
     @PostMapping(USER_LOGIN)
     public ResponseEntity<Map<String, Object>> userLogin(
             @RequestParam(value = "username", required = true) String username,
@@ -84,10 +97,10 @@ public class UserController implements UserServiceMappings, ListOfAudiences {
                 .setId(UUID.randomUUID().toString())
                 .signWith(userService.getSecretSigningKey())
                 .compact().toString();
-        System.err.println("cookie? " + setCookie);
         if (setCookie) {
             Cookie cookie = TokenAuthenticationFilter.generateAuthenticationCookie(token);
             response.addCookie(cookie);
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of("user", user));
         }
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("user", user, "token", token));
     }

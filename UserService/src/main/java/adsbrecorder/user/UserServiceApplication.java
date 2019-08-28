@@ -15,6 +15,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableJpaRepositories(basePackages = "adsbrecorder.user.repo")
 @ComponentScan(basePackages = {
+        "adsbrecorder.common.aop",
+        "adsbrecorder.common.aop.conf",
         "adsbrecorder.user",
         "adsbrecorder.user.controller",
         "adsbrecorder.user.service",
