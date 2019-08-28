@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import adsbrecorder.common.aop.CheckOwnership;
@@ -58,14 +59,15 @@ public class ReportViewController implements ReportingServiceMappings {
     }
 
     @RequireOwnership
-    @GetMapping(VIEW_REPORT_OUTPUT)
-    public ResponseEntity<Object> viewReportOutput(@PathVariable(name = "id")
-            @CheckOwnership(validator = ReportJobOwnershipValidator.class) BigInteger id) {
+    @GetMapping(value = VIEW_REPORT_OUTPUT, produces = {"application/pdf"})
+    public @ResponseBody ResponseEntity<Object> viewReportOutput(@PathVariable(name = "id")
+           @CheckOwnership(validator = ReportJobOwnershipValidator.class) BigInteger id) {
         ReportJob job = reportService.getById(id);
         try (InputStream in = storageService.asInputStream(job.getOutputName())) {
             byte[] rawReport = IOUtils.toByteArray(in);
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+            headers.add("content-disposition", String.format("attachment;filename=%s.pdf", job.getName()));
             headers.setCacheControl(CacheControl.noCache().getHeaderValue());
             return ResponseEntity.status(HttpStatus.OK).body(rawReport);
         } catch (IOException e) {

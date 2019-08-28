@@ -56,4 +56,10 @@ public class ReportJob implements Serializable {
     private String dataFilename;
 
     private String templateName;
+
+    public String getReportId() {
+        return id == null ? "-1" : id.toString();
+    }
+
+    public void setReportId() {}
 }
