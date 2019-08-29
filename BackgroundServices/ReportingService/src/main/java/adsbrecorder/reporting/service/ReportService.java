@@ -15,4 +15,5 @@ public interface ReportService {
     ReportJob getById(BigInteger id, User owner);
     ReportJob getById(BigInteger id);
     List<ReportJob> getRecentReportJobs(User owner, int amount);
+    boolean reportNameExists(String name, User owner);
 }

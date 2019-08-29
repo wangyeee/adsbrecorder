@@ -42,11 +42,24 @@ public class ReportSubmissionController implements ReportingServiceMappings {
             @RequestParam(name = "name") String reportName,
             @RequestParam(name = "day") @DateTimeFormat(pattern="yyyy-MM-dd") Date day,
             @LoginUser User user) {
+        if (reportService.reportNameExists(reportName, user)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", String.format("Report with name %s already exists.", reportName)));
+        }
         Map<String, Object> params = Map.of("day", day);
         ReportJob job = reportService.runSimpleDailySummaryReport(reportName,
                 ReportService.SIMPLE_DAILY_SUMMARY_REPORT_TYPE, params, user);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("SIMPLE_DAILY_SUMMARY_REPORT", job));
+    }
+
+    @RequireLogin
+    @GetMapping(CHECK_REPORT_NAME)
+    public ResponseEntity<Map<String, String>> checkReportName(@LoginUser User user,
+            @RequestParam(name = "name") String reportName) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("name", reportName,
+                        "exists", Boolean.toString(reportService.reportNameExists(reportName, user))));
     }
 
     @RequireOwnership

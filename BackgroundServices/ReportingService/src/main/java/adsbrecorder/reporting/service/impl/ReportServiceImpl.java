@@ -74,4 +74,9 @@ public class ReportServiceImpl implements ReportService {
     public List<ReportJob> getRecentReportJobs(User owner, int amount) {
         return this.reportJobRepository.findRecentJobsByUser(owner.getUserId(), amount);
     }
+
+    @Override
+    public boolean reportNameExists(String name, User owner) {
+        return this.reportJobRepository.findOneByNameAndSubmittedByUserId(name, owner.getUserId()).isPresent();
+    }
 }

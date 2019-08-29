@@ -2,6 +2,8 @@ package adsbrecorder.reporting.security;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,11 @@ public class ReportAuthenticationAdapter extends TokenAuthenticationAdapter impl
     @Override
     protected TokenAuthenticationFilter getTokenAuthenticationFilter() {
         return this.authenticationFilter;
+    }
+
+    @Override
+    protected Collection<String> permitAllURLs() {
+        return List.of(CHECK_REPORT_NAME);
     }
 
     @Override

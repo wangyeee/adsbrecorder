@@ -2,6 +2,7 @@ package adsbrecorder.reporting.repo;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +14,8 @@ import adsbrecorder.reporting.entity.ReportJob;
 
 public interface ReportJobRepository extends MongoRepository<ReportJob, BigInteger> {
 
+    Optional<ReportJob> findOneByName(String name);
+    Optional<ReportJob> findOneByNameAndSubmittedByUserId(String name, Long submittedByUserId);
     List<ReportJob> findAllByReportType(String reportType);
     Page<ReportJob> findAllBySubmittedByUserId(Long submittedByUserId, Pageable pageable);
 
