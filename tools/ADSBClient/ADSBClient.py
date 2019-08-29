@@ -159,7 +159,7 @@ class AuthenticationClient:
     def __init__(self, url, name, key):
         self.tokenExpiresTime = 0
         self.authEP = url
-        self.credentials = {'name': name, 'key': key}
+        self.credentials = {'name': name, 'key': key, 'cookie': False}
         self.token = None
 
     def getAuthorizationToken(self):
