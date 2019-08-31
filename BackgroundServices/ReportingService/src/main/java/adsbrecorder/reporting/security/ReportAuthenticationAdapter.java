@@ -33,7 +33,7 @@ public class ReportAuthenticationAdapter extends TokenAuthenticationAdapter impl
 
     @Override
     protected Collection<String> permitAllURLs() {
-        return List.of(CHECK_REPORT_NAME);
+        return List.of(CHECK_REPORT_NAME, SEARCH_REPORT_JOBS);
     }
 
     @Override

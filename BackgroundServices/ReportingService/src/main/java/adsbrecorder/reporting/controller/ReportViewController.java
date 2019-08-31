@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,18 @@ public class ReportViewController implements ReportingServiceMappings {
             StorageService storageService) {
         this.reportService = requireNonNull(reportService);
         this.storageService = requireNonNull(storageService);
+    }
+
+    @RequireLogin
+    @GetMapping(SEARCH_REPORT_JOBS)
+    public ResponseEntity<Object> searchReportJobs(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "start", required = false) Date startDate,
+            @RequestParam(name = "end", required = false) Date endDate,
+            @RequestParam(name = "p", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "n", required = false, defaultValue = "5") int amount,
+            @LoginUser User user) {
+        return null;
     }
 
     @RequireLogin
