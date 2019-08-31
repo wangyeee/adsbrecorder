@@ -5,9 +5,10 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +49,26 @@ public class ReportViewController implements ReportingServiceMappings {
     @RequireLogin
     @GetMapping(SEARCH_REPORT_JOBS)
     public ResponseEntity<Object> searchReportJobs(
-            @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "start", required = false) Date startDate,
-            @RequestParam(name = "end", required = false) Date endDate,
+            @RequestParam(name = "report", required = false, defaultValue = "") String reportType,
+            @RequestParam(name = "name", required = false, defaultValue = "") String reportName,
             @RequestParam(name = "p", required = false, defaultValue = "1") int page,
             @RequestParam(name = "n", required = false, defaultValue = "5") int amount,
-            @LoginUser User user) {
-        return null;
+            @LoginUser User user, HttpServletRequest request) {
+        if (page <= 0) page = -page;
+        if (page > 0) page--;
+        if (amount < 0) amount = -amount;
+        if (amount == 0) amount = 5;
+        long[] count = new long[1];
+        List<ReportJob> reports = this.reportService.searchReports(user, reportType, reportName,
+                request.getParameterMap(), page, amount, count);
+        if (reports.size() == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "No report found",
+                                 "user", user.getUsername()));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("reports", reports,
+                             "totalCount", count[0]));
     }
 
     @RequireLogin
@@ -83,7 +97,7 @@ public class ReportViewController implements ReportingServiceMappings {
             headers.add("content-disposition", String.format("attachment;filename=%s.pdf", job.getName()));
             headers.setCacheControl(CacheControl.noCache().getHeaderValue());
             return ResponseEntity.status(HttpStatus.OK).body(rawReport);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "Report output not found",
                                  "report", job.getName()));

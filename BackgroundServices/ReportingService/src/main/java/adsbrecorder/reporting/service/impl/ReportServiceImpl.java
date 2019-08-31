@@ -79,4 +79,17 @@ public class ReportServiceImpl implements ReportService {
     public boolean reportNameExists(String name, User owner) {
         return this.reportJobRepository.findOneByNameAndSubmittedByUserId(name, owner.getUserId()).isPresent();
     }
+
+    @Override
+    public List<ReportJob> searchReports(User owner, String reportType, String reportName, Map<String, String[]> params,
+            int page0, int amount, long[] allMatchCount) {
+        if (this.reportProcesses.containsKey(reportType)) {
+            return this.reportProcesses.get(reportType).search(owner, reportName, params, page0, amount, allMatchCount);
+        }
+        if (allMatchCount != null && allMatchCount.length == 1) {
+            Long matchCount = this.reportJobRepository.countReportJobsByUser(owner.getUserId());
+            allMatchCount[0] = matchCount;
+        }
+        return this.reportJobRepository.findJobsByUser(owner.getUserId(), page0, amount);
+    }
 }

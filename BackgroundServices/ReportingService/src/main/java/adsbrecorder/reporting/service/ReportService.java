@@ -16,4 +16,5 @@ public interface ReportService {
     ReportJob getById(BigInteger id);
     List<ReportJob> getRecentReportJobs(User owner, int amount);
     boolean reportNameExists(String name, User owner);
+    List<ReportJob> searchReports(User owner, String reportType, String reportName, Map<String, String[]> params, int page0, int amount, long[] allMatchCount);
 }

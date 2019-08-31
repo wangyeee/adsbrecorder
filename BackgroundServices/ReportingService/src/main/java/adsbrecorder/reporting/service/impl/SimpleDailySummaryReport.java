@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,7 @@ import adsbrecorder.reporting.repo.ReportJobRepository;
 import adsbrecorder.reporting.service.RenderService;
 import adsbrecorder.reporting.service.ReportService;
 import adsbrecorder.reporting.service.StorageService;
+import adsbrecorder.user.entity.User;
 
 @Component("simpleDailySummaryReport")
 public class SimpleDailySummaryReport implements ReportProcess {
@@ -85,5 +88,34 @@ public class SimpleDailySummaryReport implements ReportProcess {
             currentJob.setDataFilename(null);
             currentJob.setProgress(0);
         }
+    }
+
+    @Override
+    public List<ReportJob> search(User owner, String reportName, Map<String, String[]> params,
+            int page0, int amount, long[] allMatchCount) {
+        Date startDate = null;
+        Date endDate = null;
+        final String format = "yyyy-MM-dd";
+        PageRequest page = PageRequest.of(page0, amount);
+        if (params.containsKey("start")) {
+            startDate = formatDate(params.get("start")[0], format, START_DATE_LIMIT.getTime());
+        } else {
+            startDate = new Date(START_DATE_LIMIT.getTime());
+        }
+        if (params.containsKey("end")) {
+            endDate = formatDate(params.get("end")[0], format, END_DATE_LIMIT.getTime());
+        } else {
+            endDate = new Date(END_DATE_LIMIT.getTime());
+        }
+        if (startDate.getTime() == 0L && endDate.getTime() == Long.MAX_VALUE) {
+            if (allMatchCount != null && allMatchCount.length == 1) {
+                allMatchCount[0] = reportJobRepository.countReportJobs(owner.getUserId(), name(), reportName);
+            }
+            return reportJobRepository.searchReportJobs(owner.getUserId(), name(), reportName, page).getContent();
+        }
+        if (allMatchCount != null && allMatchCount.length == 1) {
+            allMatchCount[0] = reportJobRepository.countSimpleDailySummaryReportJobs(owner.getUserId(), name(), reportName, startDate, endDate);
+        }
+        return reportJobRepository.searchSimpleDailySummaryReportJobs(owner.getUserId(), name(), reportName, startDate, endDate, page).getContent();
     }
 }
