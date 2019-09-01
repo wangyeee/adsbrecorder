@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -165,5 +166,11 @@ public class UserServiceImpl implements UserService, HashUtils, RandomUtils {
     @Override
     public Key getSecretSigningKey() {
         return Keys.hmacShaKeyFor(signingKey);
+    }
+
+    @Override
+    public List<User> findUsers(Map<String, String[]> criteria, int page0, int amount, long[] matchAmount) {
+        // TODO Auto-generated method stub
+        return List.of();
     }
 }

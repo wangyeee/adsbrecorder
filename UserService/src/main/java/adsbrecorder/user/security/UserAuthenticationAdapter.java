@@ -38,6 +38,9 @@ public class UserAuthenticationAdapter extends TokenAuthenticationAdapter implem
 
     @Override
     protected Map<String, String> hasAnyAuthorityURLs() {
-        return Map.of(ROLE_ASSIGNED_USERS, ROLE_CRUD);
+        return Map.of(
+            ROLE_ASSIGNED_USERS, ROLE_CRUD,
+            LIST_OF_USERS, USER_CRUD
+        );
     }
 }

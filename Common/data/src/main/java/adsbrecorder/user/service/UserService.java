@@ -1,6 +1,8 @@
 package adsbrecorder.user.service;
 
 import java.security.Key;
+import java.util.List;
+import java.util.Map;
 
 import adsbrecorder.user.entity.User;
 
@@ -14,4 +16,5 @@ public interface UserService {
     User findUserByName(String username);
     User findUserById(Long userId);
     Key getSecretSigningKey();
+    List<User> findUsers(Map<String, String[]> criteria, int page0, int amount, long[] matchAmount);
 }

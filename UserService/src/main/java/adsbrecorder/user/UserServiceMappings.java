@@ -10,4 +10,6 @@ public interface UserServiceMappings extends URLUtils {
     String USERNAME_CHECK = "/api/user/namecheck";
 
     String ROLE_ASSIGNED_USERS = "/api/role/{role}/users";
+
+    String LIST_OF_USERS = "/api/user/list";
 }
