@@ -33,7 +33,7 @@ public class UserAuthenticationAdapter extends TokenAuthenticationAdapter implem
 
     @Override
     protected Collection<String> permitAllURLs() {
-        return List.of(USER_NEW, USER_LOGIN, USERNAME_CHECK);
+        return List.of(USER_NEW, USER_LOGIN, USERNAME_CHECK, USER_LOGOUT);
     }
 
     @Override

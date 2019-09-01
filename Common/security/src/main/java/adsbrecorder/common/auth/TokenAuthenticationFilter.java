@@ -59,10 +59,20 @@ public abstract class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     protected abstract Key getSigningKey();
 
+    public final static Cookie generateInvalidCookie() {
+        Cookie cookie = defaultCookie("");
+        cookie.setMaxAge(0);
+        return cookie;
+    }
+
     public final static Cookie generateAuthenticationCookie(String token) {
+        return defaultCookie(token);
+    }
+
+    private final static Cookie defaultCookie(String token) {
         Cookie cookie = new Cookie(jwtCookieName, token);
-        cookie.setHttpOnly(true);
         cookie.setPath("/api");
+        cookie.setHttpOnly(true);
         return cookie;
     }
 }

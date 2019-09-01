@@ -104,4 +104,11 @@ public class UserController implements UserServiceMappings, ListOfAudiences {
         }
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("user", user, "token", token));
     }
+
+    @GetMapping(USER_LOGOUT)
+    public ResponseEntity<Object> userLogout(HttpServletResponse response) {
+        Cookie cookie = TokenAuthenticationFilter.generateInvalidCookie();
+        response.addCookie(cookie);
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("logout", true));
+    }
 }
