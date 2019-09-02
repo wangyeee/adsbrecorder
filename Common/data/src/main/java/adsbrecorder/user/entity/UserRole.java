@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -38,6 +40,10 @@ public class UserRole implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "UR_EXPIRATION_DATE")
     private Date expirationDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "UR_TYPE")
+    private UserRoleType roleType;
 
     public UserRole() {
     }
@@ -80,6 +86,14 @@ public class UserRole implements Serializable {
 
     public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public UserRoleType getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(UserRoleType roleType) {
+        this.roleType = roleType;
     }
 
     @Override
