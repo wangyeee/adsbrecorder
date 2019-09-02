@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +30,7 @@ public class UserManagementController implements UserServiceMappings {
     }
 
     @GetMapping(LIST_OF_USERS)
-    public Object listOfUsers(HttpServletRequest request,
+    public ResponseEntity<Map<String, Object>> listOfUsers(HttpServletRequest request,
             @RequestParam(name = PAGE_NUMBER_URL_KEY, required = false, defaultValue = "1") int page,
             @RequestParam(name = AMOUNT_PER_PAGE_URL_KEY, required = false, defaultValue = "5") int amount) {
         if (page <= 0) page = -page;
@@ -45,5 +46,29 @@ public class UserManagementController implements UserServiceMappings {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("users", users,
                              "totalCount", count[0]));
+    }
+
+    @GetMapping(VIEW_USER_ROLES)
+    public ResponseEntity<Map<String, Object>> viewUserRoles(@PathVariable(name = "user") Long userId) {
+        User user = userService.findUserById(userId);
+        if (user.getUserId() == -1L) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "No user found"));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("userId", userId,
+                             "roles", user.getRoles()));
+    }
+
+    @GetMapping(VIEW_USER_AUTHORITIES)
+    public ResponseEntity<Map<String, Object>> viewUserAuthorities(@PathVariable(name = "user") Long userId) {
+        User user = userService.findUserById(userId);
+        if (user.getUserId() == -1L) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "No user found"));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("userId", userId,
+                             "authorities", user.getAuthorities()));
     }
 }
