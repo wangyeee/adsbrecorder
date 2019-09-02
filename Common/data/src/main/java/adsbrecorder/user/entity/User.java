@@ -127,7 +127,7 @@ public class User implements Serializable, AuthorityObject {
         this.userRoles = userRoles;
         if (userRoles != null && userRoles.isEmpty() == false) {
             Set<Role> roles = userRoles.stream().map(ur -> {
-                ur.setUser(null);
+                ur.setUser(null);  // avoid infinite loop when generating json
                 return ur.getRole();
             }).collect(Collectors.toSet());
             this.setRoles(roles);

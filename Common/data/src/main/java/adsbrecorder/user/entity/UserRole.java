@@ -42,7 +42,7 @@ public class UserRole implements Serializable {
     private Date expirationDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "UR_TYPE")
+    @Column(name = "UR_TYPE", nullable = false)
     private UserRoleType roleType;
 
     public UserRole() {

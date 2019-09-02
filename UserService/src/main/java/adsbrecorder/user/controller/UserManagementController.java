@@ -57,7 +57,7 @@ public class UserManagementController implements UserServiceMappings {
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userId", userId,
-                             "roles", user.getRoles()));
+                             "userRoles", user.getUserRoles()));
     }
 
     @GetMapping(VIEW_USER_AUTHORITIES)
