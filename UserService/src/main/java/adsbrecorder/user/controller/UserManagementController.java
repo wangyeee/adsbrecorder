@@ -30,8 +30,8 @@ public class UserManagementController implements UserServiceMappings {
 
     @GetMapping(LIST_OF_USERS)
     public Object listOfUsers(HttpServletRequest request,
-            @RequestParam(name = "p", required = false, defaultValue = "1") int page,
-            @RequestParam(name = "n", required = false, defaultValue = "5") int amount) {
+            @RequestParam(name = PAGE_NUMBER_URL_KEY, required = false, defaultValue = "1") int page,
+            @RequestParam(name = AMOUNT_PER_PAGE_URL_KEY, required = false, defaultValue = "5") int amount) {
         if (page <= 0) page = -page;
         if (page > 0) page--;
         if (amount < 0) amount = -amount;

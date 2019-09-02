@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import adsbrecorder.common.utils.HashUtils;
 import adsbrecorder.common.utils.RandomUtils;
+import adsbrecorder.common.utils.URLUtils;
 import adsbrecorder.user.entity.Authority;
 import adsbrecorder.user.entity.Role;
 import adsbrecorder.user.entity.RoleAuthority;
@@ -33,7 +34,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
-public class UserServiceImpl implements UserService, HashUtils, RandomUtils {
+public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URLUtils {
 
     private UserRepository userRepository;
     private UserRoleRepository userRoleRepository;
@@ -169,8 +170,16 @@ public class UserServiceImpl implements UserService, HashUtils, RandomUtils {
     }
 
     @Override
-    public List<User> findUsers(Map<String, String[]> criteria, int page0, int amount, long[] matchAmount) {
-        // TODO Auto-generated method stub
+    public List<User> findUsers(Map<String, String[]> criteria0, int page0, int amount, long[] matchAmount) {
+        Map<String, String> criteria = simplyRequestMap(criteria0);
+        if (criteria.isEmpty()) {
+            if (matchAmount != null && matchAmount.length == 1) {
+                long allUserCount = userRepository.count();
+                matchAmount[0] = allUserCount;
+            }
+            return userRepository.findAll(page0, amount);
+        }
+        // TODO handle query criterias
         return List.of();
     }
 }
