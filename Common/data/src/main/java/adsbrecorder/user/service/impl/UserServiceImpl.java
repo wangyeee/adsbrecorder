@@ -6,7 +6,6 @@ import java.security.Key;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,14 +20,10 @@ import org.springframework.stereotype.Service;
 import adsbrecorder.common.utils.HashUtils;
 import adsbrecorder.common.utils.RandomUtils;
 import adsbrecorder.common.utils.URLUtils;
-import adsbrecorder.user.entity.Authority;
 import adsbrecorder.user.entity.Role;
-import adsbrecorder.user.entity.RoleAuthority;
 import adsbrecorder.user.entity.User;
-import adsbrecorder.user.entity.UserRole;
-import adsbrecorder.user.repo.RoleAuthorityRepository;
 import adsbrecorder.user.repo.UserRepository;
-import adsbrecorder.user.repo.UserRoleRepository;
+import adsbrecorder.user.service.UserRoleService;
 import adsbrecorder.user.service.UserService;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -37,8 +32,7 @@ import io.jsonwebtoken.security.Keys;
 public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URLUtils {
 
     private UserRepository userRepository;
-    private UserRoleRepository userRoleRepository;
-    private RoleAuthorityRepository roleAuthorityRepository;
+    private UserRoleService userRoleService;
     private SecureRandom secureRandom;
 
     @Value("${adsbrecorder.userservice.saltlength:16}")
@@ -50,20 +44,15 @@ public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URL
     private transient byte[] signingKey;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository, RoleAuthorityRepository roleAuthorityRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserRoleService userRoleService) {
         this.userRepository = requireNonNull(userRepository);
-        this.userRoleRepository = requireNonNull(userRoleRepository);
-        this.roleAuthorityRepository = requireNonNull(roleAuthorityRepository);
+        this.userRoleService = requireNonNull(userRoleService);
         this.secureRandom = new SecureRandom();
     }
 
     @PostConstruct
     public void decodeKey() {
         signingKey = Decoders.BASE64.decode(requireNonNull(secretSigningKey));
-    }
-
-    public UserRepository getUserRepository() {
-        return userRepository;
     }
 
     @Override
@@ -116,16 +105,7 @@ public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URL
 
     @Override
     public User authorize(User user) {
-        List<UserRole> userRoles = userRoleRepository.findAllByUser(user);
-        Set<Role> roles = new HashSet<Role>();
-        userRoles.forEach(ur -> {
-            Role role = ur.getRole();
-            List<RoleAuthority> ras = roleAuthorityRepository.findAllByRole(role);
-            Set<Authority> authorities = new HashSet<Authority>();
-            ras.forEach(ra -> authorities.add(ra.getAuthority()));
-            role.setAuthorities(authorities);
-            roles.add(role);
-        });
+        Set<Role> roles = userRoleService.getUserRoles(user);
         user.setRoles(roles);
         return user;
     }
@@ -144,7 +124,7 @@ public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URL
         user.setPassword(hash(password, salt));
         user.setSalt(salt);
         user.setCreationDate(new Date());
-        return userRepository.save(user);
+        return userRoleService.assignDefaultRolesToUser(userRepository.save(user));
     }
 
     @Override

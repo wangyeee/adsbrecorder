@@ -2,15 +2,28 @@ package adsbrecorder.user.service.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import adsbrecorder.user.entity.Authority;
 import adsbrecorder.user.entity.Role;
+import adsbrecorder.user.entity.RoleAuthority;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.entity.UserRole;
+import adsbrecorder.user.repo.RoleAuthorityRepository;
+import adsbrecorder.user.repo.RoleRepository;
 import adsbrecorder.user.repo.UserRoleRepository;
 import adsbrecorder.user.service.UserRoleService;
 
@@ -18,10 +31,54 @@ import adsbrecorder.user.service.UserRoleService;
 public class UserRoleServiceImpl implements UserRoleService {
 
     private UserRoleRepository userRoleRepository;
+    private RoleAuthorityRepository roleAuthorityRepository;
+    private RoleRepository roleRepository;
+    private final transient Set<Role> defaultRoles;
+
+    @Value("${adsbrecorder.userservice.default_roles:}")
+    private String listOfDefaultRoles;
+    private final char separator = ',';
 
     @Autowired
-    public UserRoleServiceImpl(UserRoleRepository userRoleRepository) {
+    public UserRoleServiceImpl(UserRoleRepository userRoleRepository, RoleRepository roleRepository, RoleAuthorityRepository roleAuthorityRepository) {
         this.userRoleRepository = requireNonNull(userRoleRepository);
+        this.roleRepository = requireNonNull(roleRepository);
+        this.roleAuthorityRepository = requireNonNull(roleAuthorityRepository);
+        this.defaultRoles = new HashSet<Role>();
+    }
+
+    @PostConstruct
+    public void loadDefaultRoles() {
+        if (!StringUtils.isEmpty(this.listOfDefaultRoles)) {
+            this.listOfDefaultRoles = this.listOfDefaultRoles.trim();
+            final String[] roleNames = StringUtils.split(this.listOfDefaultRoles, this.separator);
+            Arrays.stream(roleNames).forEach(roleName -> {
+                Optional<Role> role = roleRepository.findOneByRoleName(roleName.trim());
+                if (role.isPresent()) {
+                    this.defaultRoles.add(role.get());
+                }
+            });
+        }
+    }
+
+    @Override
+    public User assignDefaultRolesToUser(User user) {
+        final Set<Role> currentRoles = this.getUserRoles(user);
+        final List<UserRole> userRoles = new ArrayList<UserRole>();
+        this.defaultRoles.forEach(role -> {
+            if (!currentRoles.contains(role)) {
+                UserRole ur = new UserRole();
+                ur.setRole(role);
+                ur.setUser(user);
+                ur.setCreationDate(new Date());
+                userRoles.add(ur);
+            }
+        });
+        if (userRoles.size() > 0) {
+            this.userRoleRepository.saveAll(userRoles);
+            user.setRoles(this.getUserRoles(user));
+        }
+        return user;
     }
 
     @Override
@@ -34,5 +91,20 @@ public class UserRoleServiceImpl implements UserRoleService {
         ur.setUser(user);
         ur.setCreationDate(new Date());
         return this.userRoleRepository.save(ur);
+    }
+
+    @Override
+    public Set<Role> getUserRoles(User user) {
+        List<UserRole> userRoles = userRoleRepository.findAllByUser(user);
+        Set<Role> roles = new HashSet<Role>();
+        userRoles.forEach(ur -> {
+            Role role = ur.getRole();
+            List<RoleAuthority> ras = roleAuthorityRepository.findAllByRole(role);
+            Set<Authority> authorities = new HashSet<Authority>();
+            ras.forEach(ra -> authorities.add(ra.getAuthority()));
+            role.setAuthorities(authorities);
+            roles.add(role);
+        });
+        return roles;
     }
 }
