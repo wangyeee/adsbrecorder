@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import adsbrecorder.common.utils.HashUtils;
 import adsbrecorder.common.utils.RandomUtils;
 import adsbrecorder.common.utils.URLUtils;
-import adsbrecorder.user.entity.Role;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.repo.UserRepository;
 import adsbrecorder.user.service.UserRoleService;
@@ -105,8 +103,7 @@ public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URL
 
     @Override
     public User authorize(User user) {
-        Set<Role> roles = userRoleService.getUserRoles(user);
-        user.setRoles(roles);
+        user.setUserRoles(userRoleService.getUserRoles(user));
         return user;
     }
 

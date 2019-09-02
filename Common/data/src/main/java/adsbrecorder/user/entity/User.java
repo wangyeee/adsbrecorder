@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -59,6 +60,8 @@ public class User implements Serializable, AuthorityObject {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "USER_CREATION_DATE", nullable = false)
     private Date creationDate;
+
+    private transient Set<UserRole> userRoles;
 
     private transient Set<Role> roles;
 
@@ -116,11 +119,27 @@ public class User implements Serializable, AuthorityObject {
         this.creationDate = creationDate;
     }
 
+    public Set<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(Set<UserRole> userRoles) {
+        this.userRoles = userRoles;
+        if (userRoles != null && userRoles.isEmpty() == false) {
+            Set<Role> roles = userRoles.stream().map(ur -> {
+                ur.setUser(null);
+                return ur.getRole();
+            }).collect(Collectors.toSet());
+            this.setRoles(roles);
+        }
+    }
+
+    @JsonIgnore
     public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    private void setRoles(Set<Role> roles) {
         this.roles = roles;
         if (roles != null && roles.isEmpty() == false) {
             if (this.authorities == null) {
@@ -137,6 +156,7 @@ public class User implements Serializable, AuthorityObject {
         }
     }
 
+    @JsonIgnore
     public Set<Authority> getAuthorities() {
         return authorities;
     }

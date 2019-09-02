@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -63,7 +64,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public User assignDefaultRolesToUser(User user) {
-        final Set<Role> currentRoles = this.getUserRoles(user);
+        final Set<Role> currentRoles = this.getRolesForUser(user);
         final List<UserRole> userRoles = new ArrayList<UserRole>();
         this.defaultRoles.forEach(role -> {
             if (!currentRoles.contains(role)) {
@@ -75,8 +76,10 @@ public class UserRoleServiceImpl implements UserRoleService {
             }
         });
         if (userRoles.size() > 0) {
-            this.userRoleRepository.saveAll(userRoles);
-            user.setRoles(this.getUserRoles(user));
+            user.setUserRoles(this.userRoleRepository
+                    .saveAll(userRoles)
+                    .stream()
+                    .collect(Collectors.toSet()));
         }
         return user;
     }
@@ -94,17 +97,20 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    public Set<Role> getUserRoles(User user) {
+    public Set<Role> getRolesForUser(User user) {
+        return getUserRoles(user).stream().map(ur -> ur.getRole()).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<UserRole> getUserRoles(User user) {
         List<UserRole> userRoles = userRoleRepository.findAllByUser(user);
-        Set<Role> roles = new HashSet<Role>();
-        userRoles.forEach(ur -> {
+        return userRoles.stream().map(ur -> {
             Role role = ur.getRole();
             List<RoleAuthority> ras = roleAuthorityRepository.findAllByRole(role);
             Set<Authority> authorities = new HashSet<Authority>();
             ras.forEach(ra -> authorities.add(ra.getAuthority()));
             role.setAuthorities(authorities);
-            roles.add(role);
-        });
-        return roles;
+            return ur;
+        }).collect(Collectors.toSet());
     }
 }

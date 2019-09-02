@@ -10,5 +10,6 @@ public interface UserRoleService {
 
     UserRole assignRoleToUser(Role role, User user);
     User assignDefaultRolesToUser(User user);
-    Set<Role> getUserRoles(User user);
+    Set<Role> getRolesForUser(User user);
+    Set<UserRole> getUserRoles(User user);
 }
