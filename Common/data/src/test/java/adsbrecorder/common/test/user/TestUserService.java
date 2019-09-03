@@ -1,7 +1,10 @@
 package adsbrecorder.common.test.user;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,13 +33,13 @@ import adsbrecorder.user.service.UserService;
 @SpringBootTest
 public class TestUserService {
 
+
     @Autowired
     public UserService userService;
 
     @Test
     public void testIsUsernameExist() {
-        String username = "Some name";
-        boolean exist = userService.isUsernameExist(username);
+        boolean exist = userService.isUsernameExist("Some non-exists name");
         assertFalse(exist);
     }
 
@@ -48,5 +51,16 @@ public class TestUserService {
         assertTrue(newUser.getUserId() > 0L);
         boolean exist = userService.isUsernameExist(newUser.getUsername());
         assertTrue(exist);
+    }
+
+    @Test
+    public void testUserLogin() {
+        String username = "TestUserLogin";
+        String password = "TestUserPassword";
+        userService.createNewUser(username, password);
+        User user = userService.login(username, password);
+        assertNotNull(user);
+        assertEquals(username, user.getUsername());
+        assertNotEquals(password, user.getPassword());
     }
 }
