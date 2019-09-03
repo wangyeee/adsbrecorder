@@ -21,11 +21,11 @@ public class RoleAuthority implements Serializable {
     private Long roleAuthorityId;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "RA_ROLE")
+    @JoinColumn(name = "RA_ROLE", updatable = false)
     private Role role;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "RA_AUTHORITY")
+    @JoinColumn(name = "RA_AUTHORITY", updatable = false)
     private Authority authority;
 
     @Column(name = "RA_DESCRIPTION")

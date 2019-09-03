@@ -26,11 +26,11 @@ public class UserRole implements Serializable {
     private Long userRoleId;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "UR_USER")
+    @JoinColumn(name = "UR_USER", updatable = false)
     private User user;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "UR_ROLE")
+    @JoinColumn(name = "UR_ROLE", updatable = false)
     private Role role;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -103,6 +103,7 @@ public class UserRole implements Serializable {
         result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
         result = prime * result + ((expirationDate == null) ? 0 : expirationDate.hashCode());
         result = prime * result + ((role == null) ? 0 : role.hashCode());
+        result = prime * result + ((roleType == null) ? 0 : roleType.hashCode());
         result = prime * result + ((user == null) ? 0 : user.hashCode());
         result = prime * result + ((userRoleId == null) ? 0 : userRoleId.hashCode());
         return result;
@@ -132,6 +133,8 @@ public class UserRole implements Serializable {
                 return false;
         } else if (!role.equals(other.role))
             return false;
+        if (roleType != other.roleType)
+            return false;
         if (user == null) {
             if (other.user != null)
                 return false;
@@ -148,6 +151,6 @@ public class UserRole implements Serializable {
     @Override
     public String toString() {
         return "UserRole [userRoleId=" + userRoleId + ", user=" + user + ", role=" + role + ", creationDate="
-                + creationDate + ", expirationDate=" + expirationDate + "]";
+                + creationDate + ", expirationDate=" + expirationDate + ", roleType=" + roleType + "]";
     }
 }

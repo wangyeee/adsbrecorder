@@ -23,6 +23,7 @@ import adsbrecorder.user.entity.Role;
 import adsbrecorder.user.entity.RoleAuthority;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.entity.UserRole;
+import adsbrecorder.user.entity.UserRoleType;
 import adsbrecorder.user.repo.RoleAuthorityRepository;
 import adsbrecorder.user.repo.RoleRepository;
 import adsbrecorder.user.repo.UserRoleRepository;
@@ -93,6 +94,7 @@ public class UserRoleServiceImpl implements UserRoleService {
         ur.setRole(role);
         ur.setUser(user);
         ur.setCreationDate(new Date());
+        ur.setRoleType(UserRoleType.ADMIN_ASSIGNED_ROLE);
         return this.userRoleRepository.save(ur);
     }
 

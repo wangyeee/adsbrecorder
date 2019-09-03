@@ -42,6 +42,7 @@ public class UserAuthenticationAdapter extends TokenAuthenticationAdapter implem
             ROLE_ASSIGNED_USERS, ROLE_CRUD,
             LIST_OF_USERS, USER_CRUD,
             VIEW_USER_AUTHORITIES, USER_CRUD,
+            VIEW_USER_UNASSIGNED_ROLES, USER_CRUD,
             VIEW_USER_ROLES, USER_CRUD
         );
     }

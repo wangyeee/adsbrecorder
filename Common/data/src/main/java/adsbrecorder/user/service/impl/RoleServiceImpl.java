@@ -4,8 +4,14 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +19,7 @@ import org.springframework.stereotype.Service;
 import adsbrecorder.user.entity.Authority;
 import adsbrecorder.user.entity.Role;
 import adsbrecorder.user.entity.RoleAuthority;
+import adsbrecorder.user.entity.User;
 import adsbrecorder.user.repo.AuthorityRepository;
 import adsbrecorder.user.repo.RoleAuthorityRepository;
 import adsbrecorder.user.repo.RoleRepository;
@@ -24,6 +31,7 @@ public class RoleServiceImpl implements RoleService {
     private RoleRepository roleRepository;
     private RoleAuthorityRepository roleAuthorityRepository;
     private AuthorityRepository authorityRepository;
+    private Map<String, Role> allRoles;
 
     @Autowired
     public RoleServiceImpl(RoleRepository roleRepository, RoleAuthorityRepository roleAuthorityRepository, AuthorityRepository authorityRepository) {
@@ -32,11 +40,17 @@ public class RoleServiceImpl implements RoleService {
         this.authorityRepository = requireNonNull(authorityRepository);
     }
 
+    @PostConstruct
+    public void cacheAllRoles() {
+        this.allRoles = new ConcurrentHashMap<String, Role>();
+        roleRepository.findAll().forEach(role -> this.allRoles.put(role.getRoleName(), this.retrieveRoleAuthorities(role)));
+    }
+
     @Override
     public Role findByRoleName(String roleName) {
         Optional<Role> role = roleRepository.findOneByRoleName(roleName);
         if (role.isPresent()) {
-            return retrieveRoleAuthorities(role.get());
+            return this.retrieveRoleAuthorities(role.get());
         }
         return Role.invalidRole();
     }
@@ -45,7 +59,7 @@ public class RoleServiceImpl implements RoleService {
     public Role findRoleById(Long roleId) {
         Optional<Role> role = roleRepository.findById(roleId);
         if (role.isPresent()) {
-            return retrieveRoleAuthorities(role.get());
+            return this.retrieveRoleAuthorities(role.get());
         }
         return Role.invalidRole();
     }
@@ -67,6 +81,14 @@ public class RoleServiceImpl implements RoleService {
             });
         }
         return role0;
+    }
+
+    @Override
+    public List<Role> findAvailableRoles(User user) {
+        Set<String> userRoleNames = user.getRoles().stream().map(role -> role.getRoleName()).collect(Collectors.toSet());
+        return this.allRoles.keySet().stream()
+                .flatMap(roleName -> userRoleNames.contains(roleName) ? Stream.empty() : Stream.of(this.allRoles.get(roleName)))
+                .collect(Collectors.toList());
     }
 
     private Role retrieveRoleAuthorities(Role role) {

@@ -17,16 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import adsbrecorder.user.UserServiceMappings;
 import adsbrecorder.user.entity.User;
+import adsbrecorder.user.service.RoleService;
 import adsbrecorder.user.service.UserService;
 
 @RestController
 public class UserManagementController implements UserServiceMappings {
 
     private UserService userService;
+    private RoleService roleService;
 
     @Autowired
-    public UserManagementController(UserService userService) {
+    public UserManagementController(UserService userService, RoleService roleService) {
         this.userService = requireNonNull(userService);
+        this.roleService = requireNonNull(roleService);
     }
 
     @GetMapping(LIST_OF_USERS)
@@ -70,5 +73,17 @@ public class UserManagementController implements UserServiceMappings {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userId", userId,
                              "authorities", user.getAuthorities()));
+    }
+
+    @GetMapping(VIEW_USER_UNASSIGNED_ROLES)
+    public ResponseEntity<Map<String, Object>> listUnassignedRolesForUser(@PathVariable(name = "user") Long userId) {
+        User user = userService.findUserById(userId);
+        if (user.getUserId() == -1L) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "No user found"));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("userId", userId,
+                             "rolesAvailable", this.roleService.findAvailableRoles(user)));
     }
 }
