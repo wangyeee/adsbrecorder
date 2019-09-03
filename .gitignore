@@ -16,5 +16,13 @@ buildNumber.properties
 .settings
 node_modules/*
 src/main/resources/static/built/*
-*.properties
+
+application.properties
+mariadb.properties
+mongodb.properties
+kafka.properties
+clientauth.properties
+userauth.properties
+misc.properties
+
 ADSBClientConfig.json
