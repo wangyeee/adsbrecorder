@@ -13,7 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import adsbrecorder.common.test.conf.MariaDBTestConfiguration;
+import adsbrecorder.common.test.conf.InMemoryDBTestConfiguration;
 import adsbrecorder.common.test.conf.MongoDBTestConfiguration;
 import adsbrecorder.receiver.service.VelocityUpdateService;
 
@@ -35,7 +35,7 @@ import adsbrecorder.receiver.service.VelocityUpdateService;
 @TestPropertySource(locations = "/test.properties")
 @ContextConfiguration(classes = {
         MongoDBTestConfiguration.class,
-        MariaDBTestConfiguration.class})
+        InMemoryDBTestConfiguration.class})
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @SpringBootTest

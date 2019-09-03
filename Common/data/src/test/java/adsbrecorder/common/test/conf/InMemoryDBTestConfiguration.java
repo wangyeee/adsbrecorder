@@ -4,7 +4,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,15 +13,16 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class MariaDBTestConfiguration {
+public class InMemoryDBTestConfiguration {
 
     @Autowired
     private DataSource dataSource;
 
     @Bean(destroyMethod = "")
-    @ConfigurationProperties(prefix="spring.datasource")
     public DataSource dataSource() {
-        return DataSourceBuilder.create().build();
+        return DataSourceBuilder.create()
+                .url("jdbc:h2:mem:db;DB_CLOSE_DELAY=-1")
+                .driverClassName("org.h2.Driver").build();
     }
 
     @Bean
