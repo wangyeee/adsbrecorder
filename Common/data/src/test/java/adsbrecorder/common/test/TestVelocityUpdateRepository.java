@@ -13,13 +13,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import adsbrecorder.common.test.conf.MongoDBTestConfiguration;
+import adsbrecorder.common.test.conf.EmbeddedMongoDBTestConfiguration;
 import adsbrecorder.receiver.entity.VelocityUpdate;
 import adsbrecorder.receiver.repo.VelocityUpdateRepository;
 
 @EnableMongoRepositories(basePackages = {"adsbrecorder.receiver.repo"})
 @TestPropertySource(locations = "/test.properties")
-@ContextConfiguration(classes = MongoDBTestConfiguration.class)
+@ContextConfiguration(classes = EmbeddedMongoDBTestConfiguration.class)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class TestVelocityUpdateRepository {
@@ -31,6 +31,6 @@ public class TestVelocityUpdateRepository {
     public void testFindAllActiveByAddressICAO() {
         List<VelocityUpdate> updates = velocityUpdateRepository.findAllActiveByAddressICAO(13117252);
         updates.forEach(update -> System.err.println(update));
-        assertEquals(updates.size(), 36);
+        assertEquals(updates.size(), 0);
     }
 }

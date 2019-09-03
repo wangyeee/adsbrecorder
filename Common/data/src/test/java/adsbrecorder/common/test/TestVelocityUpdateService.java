@@ -1,5 +1,7 @@
 package adsbrecorder.common.test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import adsbrecorder.common.test.conf.InMemoryDBTestConfiguration;
-import adsbrecorder.common.test.conf.MongoDBTestConfiguration;
+import adsbrecorder.common.test.conf.EmbeddedMongoDBTestConfiguration;
 import adsbrecorder.receiver.service.VelocityUpdateService;
 
 @EnableMongoRepositories(basePackages = {"adsbrecorder.receiver.repo"})
@@ -34,7 +36,7 @@ import adsbrecorder.receiver.service.VelocityUpdateService;
         "adsbrecorder.user.entity"})
 @TestPropertySource(locations = "/test.properties")
 @ContextConfiguration(classes = {
-        MongoDBTestConfiguration.class,
+        EmbeddedMongoDBTestConfiguration.class,
         InMemoryDBTestConfiguration.class})
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
@@ -46,6 +48,7 @@ public class TestVelocityUpdateService {
 
     @Test
     public void testInterleavingTrackingRecords() {
-        velocityUpdateService.interleavingTrackingRecords(13117252, System.currentTimeMillis());
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> velocityUpdateService.interleavingTrackingRecords(1, System.currentTimeMillis()));
     }
 }
