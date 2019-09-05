@@ -98,4 +98,20 @@ public class RoleServiceImpl implements RoleService {
         role.setAuthorities(authoritiesSet);
         return role;
     }
+
+    @Override
+    public Role findOrSaveByRoleName(String roleName, String displayName, String description) {
+        Optional<Role> role = roleRepository.findOneByRoleName(roleName);
+        if (role.isPresent()) {
+            Role role0 = role.get();
+            role0.setDisplayName(displayName);
+            role0.setDescription(description);
+            return this.retrieveRoleAuthorities(this.roleRepository.save(role0));
+        }
+        Role newRole = new Role();
+        newRole.setRoleName(roleName);
+        newRole.setDisplayName(displayName);
+        newRole.setDescription(description);
+        return this.roleRepository.save(newRole);
+    }
 }

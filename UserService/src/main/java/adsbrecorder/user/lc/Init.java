@@ -26,28 +26,28 @@ import adsbrecorder.user.entity.User;
 import adsbrecorder.user.entity.UserRole;
 import adsbrecorder.user.repo.AuthorityRepository;
 import adsbrecorder.user.repo.RoleAuthorityRepository;
-import adsbrecorder.user.repo.RoleRepository;
 import adsbrecorder.user.repo.UserRoleRepository;
+import adsbrecorder.user.service.RoleService;
 import adsbrecorder.user.service.UserService;
 
 @Component
 public class Init {
 
     private UserService userService;
+    private RoleService roleService;
     private UserRoleRepository userRoleRepository;
-    private RoleRepository roleRepository;
     private AuthorityRepository authorityRepository;
     private RoleAuthorityRepository roleAuthorityRepository;
 
     @Autowired
     public Init(UserService userService,
+            RoleService roleService,
             UserRoleRepository userRoleRepository,
-            RoleRepository roleRepository,
             AuthorityRepository authorityRepository,
             RoleAuthorityRepository roleAuthorityRepository) {
         this.userService = requireNonNull(userService);
+        this.roleService = requireNonNull(roleService);
         this.userRoleRepository = requireNonNull(userRoleRepository);
-        this.roleRepository = requireNonNull(roleRepository);
         this.authorityRepository = requireNonNull(authorityRepository);
         this.roleAuthorityRepository = requireNonNull(roleAuthorityRepository);
     }
@@ -76,16 +76,7 @@ public class Init {
             String displayName = ((JSONObject) role).getString("displayName");
             String roleName = ((JSONObject) role).getString("roleName");
             String description = ((JSONObject) role).getString("description");
-            Optional<Role> exist = roleRepository.findOneByRoleName(roleName);
-            if (exist.isEmpty()) {
-                Role newRole = new Role();
-                newRole.setRoleName(roleName);
-                newRole.setDisplayName(displayName);
-                newRole.setDescription(description);
-                roleNames.put(roleName, roleRepository.save(newRole));
-            } else {
-                roleNames.put(roleName, exist.get());
-            }
+            roleNames.put(roleName, roleService.findOrSaveByRoleName(roleName, displayName, description));
         });
         users.forEach(user -> {
             String username = ((JSONObject) user).getString("username");
@@ -114,12 +105,9 @@ public class Init {
                     if (roleNames.containsKey(roleName)) {
                         role = roleNames.get(roleName);
                     } else {
-                        Optional<Role> exist = roleRepository.findOneByRoleName(roleName);
-                        if (exist.isPresent()) {
-                            role = exist.get();
-                        }
+                        role = roleService.findByRoleName(roleName);
                     }
-                    if (role != null) {
+                    if (role.getRoleId() > 0L) {
                         Optional<UserRole> ur0 = userRoleRepository.findOneByUserAndRole(user0, role);
                         if (ur0.isEmpty()) {
                             UserRole newUserRole = new UserRole();
@@ -145,12 +133,9 @@ public class Init {
             if (roleNames.containsKey(roleName)) {
                 role = roleNames.get(roleName);
             } else {
-                Optional<Role> or = roleRepository.findOneByRoleName(roleName);
-                if (or.isPresent()) {
-                    role = or.get();
-                }
+                role = roleService.findByRoleName(roleName);
             }
-            if (role != null) {
+            if (role.getRoleId() > 0L) {
                 JSONArray authorityList = ((JSONObject) ra).getJSONArray("authorities");
                 final Role role0 = role;
                 authorityList.forEach(auth -> {
