@@ -3,6 +3,7 @@ package adsbrecorder.common.test.user;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,7 +34,6 @@ import adsbrecorder.user.service.UserService;
 @SpringBootTest
 public class TestUserService {
 
-
     @Autowired
     public UserService userService;
 
@@ -62,5 +62,39 @@ public class TestUserService {
         assertNotNull(user);
         assertEquals(username, user.getUsername());
         assertNotEquals(password, user.getPassword());
+    }
+    
+    @Test
+    public void testUserLoginHash() {
+        String username = "TestUserLoginHash";
+        String password = "TestUserPassword";
+        userService.createNewUser(username, password);
+        User user = userService.login(username, password);
+        User userHash = userService.loginHash(user.getUsername(), user.getPassword());
+        assertEquals(user, userHash);
+        User incorrectHash = userService.loginHash(user.getUsername(), user.getPassword() + "incorrect");
+        assertNull(incorrectHash);
+    }
+
+    @Test
+    public void testFindUserByName() {
+        String username = "TestUserFindUserByName";
+        String password = "TestUserPassword";
+        User newUser = userService.createNewUser(username, password);
+        User findByName = userService.findUserByName(username);
+        assertEquals(newUser, findByName);
+        User unauthorizedUser = userService.findUserByName("Non-exists username");
+        assertEquals(unauthorizedUser.getUserId(), Long.valueOf(-1L));
+    }
+
+    @Test
+    public void testFindUserById() {
+        String username = "TestUserFindUserById";
+        String password = "TestUserPassword";
+        User newUser = userService.createNewUser(username, password);
+        User findById = userService.findUserById(newUser.getUserId());
+        assertEquals(newUser, findById);
+        User unauthorizedUser = userService.findUserById(-2L);
+        assertEquals(unauthorizedUser.getUserId(), Long.valueOf(-1L));
     }
 }
