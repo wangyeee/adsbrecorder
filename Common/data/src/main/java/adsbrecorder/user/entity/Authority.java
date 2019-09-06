@@ -18,7 +18,7 @@ public class Authority implements GrantedAuthority {
     @Column(name = "AUTHORITY_ID")
     private Long authorityId;
 
-    @Column(name = "AUTHORITY_NAME")
+    @Column(name = "AUTHORITY_NAME", unique = true, nullable = false)
     private String authority;
 
     @Column(name = "AUTHORITY_DISP_NAME")
