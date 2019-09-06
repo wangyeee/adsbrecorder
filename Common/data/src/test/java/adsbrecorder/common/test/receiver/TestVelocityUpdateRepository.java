@@ -1,4 +1,4 @@
-package adsbrecorder.common.test;
+package adsbrecorder.common.test.receiver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
