@@ -73,6 +73,7 @@ public class UserRoleServiceImpl implements UserRoleService {
                 ur.setRole(role);
                 ur.setUser(user);
                 ur.setCreationDate(new Date());
+                ur.setRoleType(UserRoleType.DEFAULT_USER_ROLE);
                 userRoles.add(ur);
             }
         });
