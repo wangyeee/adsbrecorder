@@ -4,11 +4,13 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -39,14 +41,16 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Value("${adsbrecorder.userservice.default_roles:}")
     private String listOfDefaultRoles;
-    private final char separator = ',';
+
+    @Value("${adsbrecorder.userservice.default_roles_separator:,}")
+    private char separator;
 
     @Autowired
     public UserRoleServiceImpl(UserRoleRepository userRoleRepository, RoleRepository roleRepository, RoleAuthorityRepository roleAuthorityRepository) {
         this.userRoleRepository = requireNonNull(userRoleRepository);
         this.roleRepository = requireNonNull(roleRepository);
         this.roleAuthorityRepository = requireNonNull(roleAuthorityRepository);
-        this.defaultRoles = new HashSet<Role>();
+        this.defaultRoles = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 
     @PostConstruct
