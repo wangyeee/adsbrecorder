@@ -2,6 +2,7 @@ package adsbrecorder.common.test.user;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -41,6 +43,10 @@ public class TestAuthorityService {
         Authority created = createAuthorityHelper(authority, displayName, description);
         assertNotNull(created.getAuthorityId());
         assertTrue(created.getAuthorityId() > 0L);
+        assertThrows(DataIntegrityViolationException.class,
+                () -> createAuthorityHelper(authority, displayName, description));
+        assertThrows(DataIntegrityViolationException.class,
+                () -> createAuthorityHelper(null, displayName, description));
     }
 
     private Authority createAuthorityHelper(String authority, String displayName, String description) {
