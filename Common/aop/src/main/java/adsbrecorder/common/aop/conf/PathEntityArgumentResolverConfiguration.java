@@ -10,6 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import adsbrecorder.common.aop.PathEntityArgumentResolver;
+import adsbrecorder.common.utils.AutoResolvableEntity;
 import adsbrecorder.user.entity.Role;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.service.RoleService;
@@ -26,7 +27,7 @@ public class PathEntityArgumentResolverConfiguration implements WebMvcConfigurer
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        Map<Class<?>, Function<? super Number, ?>> map = Map.of(
+        Map<Class<?>, Function<? super Number, ? extends AutoResolvableEntity>> map = Map.of(
             User.class, (id) -> this.userService.findUserById((Long) id),
             Role.class, (id) -> this.roleService.findRoleById((Long) id)
         );

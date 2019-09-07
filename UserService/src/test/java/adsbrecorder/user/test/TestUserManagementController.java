@@ -113,6 +113,9 @@ public class TestUserManagementController implements UserServiceMappings {
                     get(VIEW_USER_ROLES, userId).header("Authorization", jwt))
                     .andExpect(status().isOk()).andReturn().getResponse();
             assertNotNull(response.getContentAsString());
+            mockMvc.perform(
+                    get(VIEW_USER_ROLES, userId + 1).header("Authorization", jwt))
+                    .andExpect(status().isNotFound());
         } catch (Exception e) {
             fail(e);
         }
@@ -128,6 +131,9 @@ public class TestUserManagementController implements UserServiceMappings {
                     get(VIEW_USER_AUTHORITIES, userId).header("Authorization", jwt))
                     .andExpect(status().isOk()).andReturn().getResponse();
             assertNotNull(response.getContentAsString());
+            mockMvc.perform(
+                    get(VIEW_USER_AUTHORITIES, userId + 1).header("Authorization", jwt))
+                    .andExpect(status().isNotFound());
         } catch (Exception e) {
             fail(e);
         }
@@ -143,6 +149,9 @@ public class TestUserManagementController implements UserServiceMappings {
                     get(VIEW_USER_UNASSIGNED_ROLES, userId).header("Authorization", jwt))
                     .andExpect(status().isOk()).andReturn().getResponse();
             assertNotNull(response.getContentAsString());
+            mockMvc.perform(
+                    get(VIEW_USER_UNASSIGNED_ROLES, userId + 1).header("Authorization", jwt))
+                    .andExpect(status().isNotFound());
         } catch (Exception e) {
             fail(e);
         }

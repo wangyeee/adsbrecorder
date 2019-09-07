@@ -9,9 +9,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import adsbrecorder.common.utils.AutoResolvableEntity;
+
 @Entity
 @Table(name = "AREC_ROLE")
-public class Role implements Serializable {
+public class Role implements Serializable, AutoResolvableEntity {
     private static final long serialVersionUID = -4822539068194765879L;
 
     private static Role _invalidRole;
@@ -136,5 +138,10 @@ public class Role implements Serializable {
     public String toString() {
         return "Role [roleId=" + roleId + ", roleName=" + roleName + ", displayName=" + displayName + ", description="
                 + description + "]";
+    }
+
+    @Override
+    public boolean isValidEntity() {
+        return this.getRoleId() > 0L;
     }
 }

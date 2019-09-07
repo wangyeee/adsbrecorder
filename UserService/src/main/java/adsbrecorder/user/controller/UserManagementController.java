@@ -53,11 +53,6 @@ public class UserManagementController implements UserServiceMappings {
 
     @GetMapping(VIEW_USER_ROLES)
     public ResponseEntity<Map<String, Object>> viewUserRoles(@PathEntity(name = "user") User user) {
-        if (user.getUserId() == -1L) {
-            // TODO move this check to PathEntityArgumentResolver
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "No user found"));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userId", user.getUserId(),
                              "userRoles", user.getUserRoles()));
@@ -65,10 +60,6 @@ public class UserManagementController implements UserServiceMappings {
 
     @GetMapping(VIEW_USER_AUTHORITIES)
     public ResponseEntity<Map<String, Object>> viewUserAuthorities(@PathEntity(name = "user") User user) {
-        if (user.getUserId() == -1L) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "No user found"));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userId", user.getUserId(),
                              "authorities", user.getAuthorities()));
@@ -76,10 +67,6 @@ public class UserManagementController implements UserServiceMappings {
 
     @GetMapping(VIEW_USER_UNASSIGNED_ROLES)
     public ResponseEntity<Map<String, Object>> listUnassignedRolesForUser(@PathEntity(name = "user") User user) {
-        if (user.getUserId() == -1L) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "No user found"));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userId", user.getUserId(),
                              "rolesAvailable", this.roleService.findAvailableRoles(user)));

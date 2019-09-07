@@ -19,10 +19,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import adsbrecorder.common.auth.AuthorityObject;
+import adsbrecorder.common.utils.AutoResolvableEntity;
 
 @Entity
 @Table(name = "AREC_USER")
-public class User implements Serializable, AuthorityObject {
+public class User implements Serializable, AuthorityObject, AutoResolvableEntity {
     private static final long serialVersionUID = -8503282652540269258L;
 
     private final static User unauthorizedUser;
@@ -214,5 +215,10 @@ public class User implements Serializable, AuthorityObject {
     public String toString() {
         return "User [userId=" + userId + ", username=" + username + ", password=" + password + ", salt=" + salt
                 + ", creationDate=" + creationDate + ", roles=" + roles + "]";
+    }
+
+    @Override
+    public boolean isValidEntity() {
+        return this.getUserId() > 0L;
     }
 }
