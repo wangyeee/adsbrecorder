@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import adsbrecorder.common.aop.CheckOwnership;
-import adsbrecorder.common.aop.LoginUser;
-import adsbrecorder.common.aop.RequireLogin;
-import adsbrecorder.common.aop.RequireOwnership;
+import adsbrecorder.common.aop.annotation.CheckOwnership;
+import adsbrecorder.common.aop.annotation.LoginUser;
+import adsbrecorder.common.aop.annotation.RequireLogin;
+import adsbrecorder.common.aop.annotation.RequireOwnership;
 import adsbrecorder.reporting.ReportingServiceMappings;
 import adsbrecorder.reporting.entity.ReportJob;
 import adsbrecorder.reporting.service.ReportService;

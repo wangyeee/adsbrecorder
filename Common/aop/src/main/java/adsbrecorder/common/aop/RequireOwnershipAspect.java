@@ -19,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import adsbrecorder.common.aop.annotation.AnnotationUtils;
+import adsbrecorder.common.aop.annotation.CheckOwnership;
 import adsbrecorder.common.validator.OwnershipValidator;
 import adsbrecorder.security.exception.AuthorizationExpiredException;
 import adsbrecorder.user.entity.User;

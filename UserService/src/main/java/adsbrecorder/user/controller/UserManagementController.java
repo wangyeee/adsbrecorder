@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import adsbrecorder.common.aop.PathEntity;
+import adsbrecorder.common.aop.annotation.PathEntity;
 import adsbrecorder.user.UserServiceMappings;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.service.RoleService;

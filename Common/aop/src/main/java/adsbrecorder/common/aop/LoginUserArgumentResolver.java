@@ -10,6 +10,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import adsbrecorder.common.aop.annotation.LoginUser;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.service.UserService;
 

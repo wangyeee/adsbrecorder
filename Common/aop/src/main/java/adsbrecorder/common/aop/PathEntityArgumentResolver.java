@@ -17,6 +17,7 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import adsbrecorder.aop.exception.ArgumentResolverException;
 import adsbrecorder.aop.exception.EntityNotFoundException;
+import adsbrecorder.common.aop.annotation.PathEntity;
 import adsbrecorder.common.utils.AutoResolvableEntity;
 
 public class PathEntityArgumentResolver implements HandlerMethodArgumentResolver {

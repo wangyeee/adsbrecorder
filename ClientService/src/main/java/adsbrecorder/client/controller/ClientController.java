@@ -26,10 +26,10 @@ import adsbrecorder.client.ClientServiceMappings;
 import adsbrecorder.client.entity.RemoteReceiver;
 import adsbrecorder.client.service.RemoteReceiverService;
 import adsbrecorder.client.service.impl.RemoteReceiverOwnershipChecker;
-import adsbrecorder.common.aop.CheckOwnership;
-import adsbrecorder.common.aop.LoginUser;
-import adsbrecorder.common.aop.RequireLogin;
-import adsbrecorder.common.aop.RequireOwnership;
+import adsbrecorder.common.aop.annotation.CheckOwnership;
+import adsbrecorder.common.aop.annotation.LoginUser;
+import adsbrecorder.common.aop.annotation.RequireLogin;
+import adsbrecorder.common.aop.annotation.RequireOwnership;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.service.UserService;
 

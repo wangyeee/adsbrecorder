@@ -1,4 +1,4 @@
-package adsbrecorder.common.aop;
+package adsbrecorder.common.aop.annotation;
 
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import adsbrecorder.common.aop.LoginUser;
-import adsbrecorder.common.aop.RequireLogin;
+import adsbrecorder.common.aop.annotation.LoginUser;
+import adsbrecorder.common.aop.annotation.RequireLogin;
 import adsbrecorder.common.auth.ListOfAudiences;
 import adsbrecorder.common.auth.TokenAuthenticationFilter;
 import adsbrecorder.user.UserServiceMappings;

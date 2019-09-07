@@ -1,4 +1,4 @@
-package adsbrecorder.common.aop;
+package adsbrecorder.common.aop.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
