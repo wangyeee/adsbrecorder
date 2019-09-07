@@ -52,10 +52,10 @@ public class TestUserManagementController implements UserServiceMappings {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
- 
+
     @Autowired
     private FilterChainProxy filterChainProxy;
- 
+
     private MockMvc mockMvc;
 
     private final String adminUsername = "Admin";
