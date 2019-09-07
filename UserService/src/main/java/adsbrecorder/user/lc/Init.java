@@ -24,6 +24,7 @@ import adsbrecorder.user.entity.Role;
 import adsbrecorder.user.entity.RoleAuthority;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.entity.UserRole;
+import adsbrecorder.user.entity.UserRoleType;
 import adsbrecorder.user.repo.AuthorityRepository;
 import adsbrecorder.user.repo.RoleAuthorityRepository;
 import adsbrecorder.user.repo.UserRoleRepository;
@@ -52,8 +53,7 @@ public class Init {
         this.roleAuthorityRepository = requireNonNull(roleAuthorityRepository);
     }
 
-    public void loadDefaultUserRoles() {
-        Resource resource = new ClassPathResource("default_user_roles.json");
+    public void loadDefaultUserRoles(Resource resource) {
         try (InputStream in = resource.getInputStream()) {
             String jsonTxt = IOUtils.toString(in, "UTF-8");
             JSONObject json = new JSONObject(jsonTxt);
@@ -114,6 +114,7 @@ public class Init {
                             newUserRole.setUser(user0);
                             newUserRole.setRole(role);
                             newUserRole.setCreationDate(new Date());
+                            newUserRole.setRoleType(UserRoleType.SYSTEM_ROLE);
                             userRoleRepository.save(newUserRole);
                         }
                     }
@@ -162,6 +163,6 @@ public class Init {
 
     @EventListener
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        loadDefaultUserRoles();
+        loadDefaultUserRoles(new ClassPathResource("default_user_roles.json"));
     }
 }
