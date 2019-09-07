@@ -33,10 +33,12 @@ import adsbrecorder.user.UserServiceMappings;
 import adsbrecorder.user.controller.UserController;
 import adsbrecorder.user.controller.UserManagementController;
 import adsbrecorder.user.test.conf.InMemoryDBTestConfiguration;
+
 @EnableJpaRepositories(basePackages = "adsbrecorder.user.repo")
 @TestPropertySource(locations = "/test.properties")
 @ContextConfiguration(classes = InMemoryDBTestConfiguration.class)
 @ComponentScan(basePackages = {
+        "adsbrecorder.common.aop.conf",
         "adsbrecorder.user.test.conf",
         "adsbrecorder.user.lc",
         "adsbrecorder.user.security",

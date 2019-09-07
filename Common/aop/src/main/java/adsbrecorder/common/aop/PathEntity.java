@@ -17,4 +17,6 @@ public @interface PathEntity {
 
     @AliasFor("value")
     String name() default "";
+
+    Class<?> idDataType() default Long.class;
 }

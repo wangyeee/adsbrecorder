@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import adsbrecorder.common.aop.PathEntity;
 import adsbrecorder.user.UserServiceMappings;
 import adsbrecorder.user.entity.User;
 import adsbrecorder.user.service.RoleService;
@@ -52,38 +52,36 @@ public class UserManagementController implements UserServiceMappings {
     }
 
     @GetMapping(VIEW_USER_ROLES)
-    public ResponseEntity<Map<String, Object>> viewUserRoles(@PathVariable(name = "user") Long userId) {
-        User user = userService.findUserById(userId);
+    public ResponseEntity<Map<String, Object>> viewUserRoles(@PathEntity(name = "user") User user) {
         if (user.getUserId() == -1L) {
+            // TODO move this check to PathEntityArgumentResolver
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "No user found"));
         }
         return ResponseEntity.status(HttpStatus.OK)
-                .body(Map.of("userId", userId,
+                .body(Map.of("userId", user.getUserId(),
                              "userRoles", user.getUserRoles()));
     }
 
     @GetMapping(VIEW_USER_AUTHORITIES)
-    public ResponseEntity<Map<String, Object>> viewUserAuthorities(@PathVariable(name = "user") Long userId) {
-        User user = userService.findUserById(userId);
+    public ResponseEntity<Map<String, Object>> viewUserAuthorities(@PathEntity(name = "user") User user) {
         if (user.getUserId() == -1L) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "No user found"));
         }
         return ResponseEntity.status(HttpStatus.OK)
-                .body(Map.of("userId", userId,
+                .body(Map.of("userId", user.getUserId(),
                              "authorities", user.getAuthorities()));
     }
 
     @GetMapping(VIEW_USER_UNASSIGNED_ROLES)
-    public ResponseEntity<Map<String, Object>> listUnassignedRolesForUser(@PathVariable(name = "user") Long userId) {
-        User user = userService.findUserById(userId);
+    public ResponseEntity<Map<String, Object>> listUnassignedRolesForUser(@PathEntity(name = "user") User user) {
         if (user.getUserId() == -1L) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "No user found"));
         }
         return ResponseEntity.status(HttpStatus.OK)
-                .body(Map.of("userId", userId,
+                .body(Map.of("userId", user.getUserId(),
                              "rolesAvailable", this.roleService.findAvailableRoles(user)));
     }
 }
