@@ -62,7 +62,7 @@ public class UserManagementController implements UserServiceMappings {
     public ResponseEntity<Map<String, Object>> viewUserAuthorities(@PathEntity(name = "user") User user) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userId", user.getUserId(),
-                             "authorities", user.getAuthorities()));
+                             "authorities", user.getDirectAuthorities()));
     }
 
     @GetMapping(VIEW_USER_UNASSIGNED_ROLES)

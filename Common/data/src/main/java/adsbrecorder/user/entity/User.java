@@ -2,9 +2,9 @@ package adsbrecorder.user.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -66,7 +66,10 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
 
     private transient Set<Role> roles;
 
+    @Deprecated
     private transient Set<Authority> authorities;
+
+    private transient Set<UserAuthority> directAuthorities;
 
     public User() {
     }
@@ -124,6 +127,22 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
         return userRoles;
     }
 
+    @JsonIgnore
+    public Set<UserAuthority> getDirectAuthorities() {
+        return directAuthorities;
+    }
+
+    public void setDirectAuthorities(Set<UserAuthority> directAuthorities) {
+        this.directAuthorities = directAuthorities;
+        if (directAuthorities != null && directAuthorities.size() > 0) {
+            if (this.authorities == null) {
+                this.authorities = directAuthorities.stream().map(da -> da.getAuthority()).collect(Collectors.toSet());
+            } else {
+                directAuthorities.forEach(da -> this.authorities.add(da.getAuthority()));
+            }
+        }
+    }
+
     public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
         if (userRoles != null && userRoles.isEmpty() == false) {
@@ -131,7 +150,40 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
                 ur.setUser(null);  // avoid infinite loop when generating json
                 return ur.getRole();
             }).collect(Collectors.toSet());
-            this.setRoles(roles);
+            this.setRoles(roles);  // TODO remove
+            ///////
+            if (this.directAuthorities == null) {
+                this.directAuthorities = userRoles.stream().flatMap(ur -> {
+                    Set<Authority> newAuth = ur.getRole().getAuthorities();
+                    if (newAuth != null && newAuth.isEmpty() == false) {
+                        return newAuth.stream().map(auth -> {
+                            UserAuthority ua = new UserAuthority();
+                            ua.setAuthority(auth);
+                            ua.setUser(this);
+                            ua.setType(UserAuthorityType.DERIVED_ROLE_AUTHORITY);
+                            ua.setCreationDate(ur.getCreationDate());
+                            ua.setExpirationDate(ur.getExpirationDate());
+                            return ua;
+                        });
+                    }
+                    return Stream.empty();
+                }).collect(Collectors.toSet());
+            } else {
+                userRoles.forEach(ur -> {
+                    Set<Authority> newAuth = ur.getRole().getAuthorities();
+                    if (newAuth != null && newAuth.isEmpty() == false) {
+                        this.directAuthorities.addAll(newAuth.stream().map(auth -> {
+                            UserAuthority ua = new UserAuthority();
+                            ua.setAuthority(auth);
+                            ua.setUser(this);
+                            ua.setType(UserAuthorityType.DERIVED_ROLE_AUTHORITY);
+                            ua.setCreationDate(ur.getCreationDate());
+                            ua.setExpirationDate(ur.getExpirationDate());
+                            return ua;
+                        }).collect(Collectors.toSet()));
+                    }
+                });
+            }
         }
     }
 
@@ -144,16 +196,21 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
         this.roles = roles;
         if (roles != null && roles.isEmpty() == false) {
             if (this.authorities == null) {
-                this.authorities = new HashSet<Authority>();
+                this.authorities = roles.stream().flatMap(role -> {
+                    Set<Authority> newAuth = role.getAuthorities();
+                    if (newAuth != null && newAuth.isEmpty() == false) {
+                        return role.getAuthorities().stream();
+                    }
+                    return Stream.empty();
+                }).collect(Collectors.toSet());
             } else {
-                this.authorities.clear();
+                roles.forEach(role -> {
+                    Set<Authority> newAuth = role.getAuthorities();
+                    if (newAuth != null && newAuth.isEmpty() == false) {
+                        this.authorities.addAll(role.getAuthorities());
+                    }
+                });
             }
-            roles.forEach(role -> {
-                Set<Authority> newAuth = role.getAuthorities();
-                if (newAuth != null && newAuth.isEmpty() == false) {
-                    this.authorities.addAll(role.getAuthorities());
-                }
-            });
         }
     }
 
