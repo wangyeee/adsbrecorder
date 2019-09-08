@@ -29,7 +29,7 @@ public class RequireLoginAspect implements AnnotationUtils {
         this.userService = requireNonNull(userService);
     }
 
-    @Before("@annotation(adsbrecorder.common.aop.RequireLogin) && execution(public * *(..))")
+    @Before("@annotation(adsbrecorder.common.aop.annotation.RequireLogin) && execution(public * *(..))")
     public void requireLoginCheck(final JoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         RequireLogin annotation = signature.getMethod().getAnnotation(RequireLogin.class);

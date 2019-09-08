@@ -54,7 +54,7 @@ public class RequireOwnershipAspect implements AnnotationUtils {
         });
     }
 
-    @Before("@annotation(adsbrecorder.common.aop.RequireOwnership) && execution(public * *(..))")
+    @Before("@annotation(adsbrecorder.common.aop.annotation.RequireOwnership) && execution(public * *(..))")
     public void requireOwnershipCheck(final JoinPoint joinPoint) throws Throwable {
         Signature s = joinPoint.getSignature();
         if (s instanceof MethodSignature) {

@@ -120,4 +120,15 @@ public class UserRoleServiceImpl implements UserRoleService {
             return ur;
         }).collect(Collectors.toSet());
     }
+
+    @Override
+    public void removeRoleFromUser(Role role, User user) {
+        Optional<UserRole> uro =  userRoleRepository.findOneByUserAndRole(user, role);
+        if (uro.isPresent()) {
+            UserRole ur = uro.get();
+            if (UserRoleType.ADMIN_ASSIGNED_ROLE.equals(ur.getRoleType())) {
+                userRoleRepository.delete(ur);
+            }
+        }
+    }
 }

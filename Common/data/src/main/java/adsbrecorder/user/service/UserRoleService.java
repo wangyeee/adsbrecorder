@@ -9,6 +9,7 @@ import adsbrecorder.user.entity.UserRole;
 public interface UserRoleService {
 
     UserRole assignRoleToUser(Role role, User user);
+    void removeRoleFromUser(Role role, User user);
     User assignDefaultRolesToUser(User user);
     Set<Role> getRolesForUser(User user);
     Set<UserRole> getUserRoles(User user);
