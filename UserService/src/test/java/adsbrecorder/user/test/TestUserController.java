@@ -3,6 +3,7 @@ package adsbrecorder.user.test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
@@ -230,7 +231,59 @@ public class TestUserController implements UserServiceMappings {
         }
     }
 
-    Long registerUser(String username, String password) throws Exception {
+    @Test
+    public void testRemoveRoleFromUser() {
+        try {
+            MockHttpServletResponse loginResponse = mockMvc.perform(
+                    post(USER_LOGIN)
+                    .param("username", adminUsername)
+                    .param("password", adminPassword))
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists(jwtCookieName))
+                .andReturn()
+                .getResponse();
+            Long roleId = -1L;
+            final String newRoleName = "REPORT_USER";
+            JSONObject loginJson = new JSONObject(loginResponse.getContentAsString());
+            JSONArray roles = loginJson.getJSONObject("user").optJSONArray("userRoles");
+            for (Object role0 : roles) {
+                JSONObject role = ((JSONObject) role0).getJSONObject("role");
+                if (newRoleName.equals(role.get("roleName"))) {
+                    roleId = Long.valueOf(String.valueOf(role.get("roleId")));
+                    break;
+                }
+            }
+            Cookie cookie0 = null;
+            Cookie[] cookies = loginResponse.getCookies();
+            for (Cookie cookie : cookies) {
+                if (jwtCookieName.equals(cookie.getName())) {
+                    cookie0 = cookie;
+                    break;
+                }
+            }
+            Long newUserId = registerUser("TestRemoveRoleFromUser", "TestRemoveRoleFromUserPassword");
+            MockHttpServletResponse assignRoleResponse = mockMvc.perform(
+                    post(ROLE_ASSIGNED_USERS, String.valueOf(roleId))
+                    .param("user", String.valueOf(newUserId)).cookie(cookie0))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse();
+            JSONObject jsonObject = new JSONObject(assignRoleResponse.getContentAsString());
+            assertNotNull(jsonObject);
+            mockMvc.perform(
+                    delete(ROLE_ASSIGNED_USERS, String.valueOf(roleId))
+                    .param("user", String.valueOf(newUserId)).cookie(cookie0))
+                .andExpect(status().isOk());
+            mockMvc.perform(
+                    delete(ROLE_ASSIGNED_USERS, String.valueOf(roleId))
+                    .param("user", String.valueOf(newUserId)).cookie(cookie0))
+                .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
+    }
+
+    private Long registerUser(String username, String password) throws Exception {
         MockHttpServletResponse response = mockMvc.perform(
                 post(USER_NEW)
                 .param("username", username)
