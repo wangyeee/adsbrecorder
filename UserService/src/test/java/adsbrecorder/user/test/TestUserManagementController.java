@@ -3,8 +3,6 @@ package adsbrecorder.user.test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Map;
@@ -29,7 +27,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import adsbrecorder.user.UserServiceMappings;
 import adsbrecorder.user.controller.UserController;
 import adsbrecorder.user.controller.UserManagementController;
 import adsbrecorder.user.test.conf.InMemoryDBTestConfiguration;
@@ -48,7 +45,7 @@ import adsbrecorder.user.test.conf.InMemoryDBTestConfiguration;
         "adsbrecorder.user.entity"})
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = {UserManagementController.class, UserController.class})
-public class TestUserManagementController implements UserServiceMappings {
+public class TestUserManagementController implements TestUserUtils {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -80,7 +77,7 @@ public class TestUserManagementController implements UserServiceMappings {
     @Test
     public void testListOfUsersAdminLoginHeader() {
         try {
-            final String jwt = "Bearer " + getLoginToken(adminUsername, adminPassword);
+            final String jwt = "Bearer " + getLoginToken(mockMvc, adminUsername, adminPassword);
             MockHttpServletResponse response = mockMvc.perform(
                     get(LIST_OF_USERS).header("Authorization", jwt))
                     .andExpect(status().isOk()).andReturn().getResponse();
@@ -93,7 +90,7 @@ public class TestUserManagementController implements UserServiceMappings {
     @Test
     public void testListOfUsersAdminLoginCookie() {
         try {
-            Cookie cookie = getLoginCookie(adminUsername, adminPassword);
+            Cookie cookie = getLoginCookie(mockMvc, adminUsername, adminPassword);
             MockHttpServletResponse response = mockMvc.perform(
                     get(LIST_OF_USERS).cookie(cookie))
                     .andExpect(status().isOk()).andReturn().getResponse();
@@ -106,7 +103,7 @@ public class TestUserManagementController implements UserServiceMappings {
     @Test
     public void testViewUserRoles() {
         try {
-            Map<String, Object> map = login(adminUsername, adminPassword);
+            Map<String, Object> map = login(mockMvc, adminUsername, adminPassword);
             final String jwt = String.valueOf(map.get("token"));
             final long userId = Long.parseLong(String.valueOf(((JSONObject)map.get("user")).get("userId")));
             MockHttpServletResponse response = mockMvc.perform(
@@ -124,7 +121,7 @@ public class TestUserManagementController implements UserServiceMappings {
     @Test
     public void testViewUserAuthorities() {
         try {
-            Map<String, Object> map = login(adminUsername, adminPassword);
+            Map<String, Object> map = login(mockMvc, adminUsername, adminPassword);
             final String jwt = String.valueOf(map.get("token"));
             final long userId = Long.parseLong(String.valueOf(((JSONObject)map.get("user")).get("userId")));
             MockHttpServletResponse response = mockMvc.perform(
@@ -142,7 +139,7 @@ public class TestUserManagementController implements UserServiceMappings {
     @Test
     public void testListUnassignedRolesForUser() {
         try {
-            Map<String, Object> map = login(adminUsername, adminPassword);
+            Map<String, Object> map = login(mockMvc, adminUsername, adminPassword);
             final String jwt = String.valueOf(map.get("token"));
             final long userId = Long.parseLong(String.valueOf(((JSONObject)map.get("user")).get("userId")));
             MockHttpServletResponse response = mockMvc.perform(
@@ -155,37 +152,5 @@ public class TestUserManagementController implements UserServiceMappings {
         } catch (Exception e) {
             fail(e);
         }
-    }
-
-    private Map<String, Object> login(String username, String password) throws Exception {
-        final String name = "JWT-AUTH";
-        Cookie cookie0 = null;
-        MockHttpServletResponse response = mockMvc.perform(
-                post(USER_LOGIN)
-                .param("username", username)
-                .param("password", password))
-            .andExpect(status().isOk())
-            .andExpect(cookie().exists(name))
-            .andReturn()
-            .getResponse();
-        Cookie[] cookies = response.getCookies();
-        for (Cookie cookie : cookies) {
-            if (name.equals(cookie.getName())) {
-                cookie0 = cookie;
-                break;
-            }
-        }
-        JSONObject jsonObject = new JSONObject(response.getContentAsString());
-        return Map.of("token", "Bearer " + cookie0.getValue(),
-                "cookie", cookie0,
-                "user", jsonObject.get("user"));
-    }
-
-    private String getLoginToken(String username, String password) throws Exception {
-        return String.valueOf(login(username, password).get("token"));
-    }
-
-    private Cookie getLoginCookie(String username, String password) throws Exception {
-        return (Cookie) login(username, password).get("cookie");
     }
 }
