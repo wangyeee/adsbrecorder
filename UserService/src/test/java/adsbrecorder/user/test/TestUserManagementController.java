@@ -153,4 +153,21 @@ public class TestUserManagementController implements TestUserUtils {
             fail(e);
         }
     }
+
+    @Test
+    public void testListUnassignedAuthoritiesForUser() {
+        final String username = "ListUnassignedAuthoritiesForUser";
+        final String password = "ListUnassignedAuthoritiesForUser Password";
+        try {
+            final long userId = registerUser(mockMvc, username, password);
+            Map<String, Object> map = login(mockMvc, adminUsername, adminPassword);
+            final String jwt = String.valueOf(map.get("token"));
+            MockHttpServletResponse response = mockMvc.perform(
+                    get(VIEW_USER_UNASSIGNED_AUTHORITIES, userId).header("Authorization", jwt))
+                    .andExpect(status().isOk()).andReturn().getResponse();
+            assertNotNull(response.getContentAsString());
+        } catch (Exception e) {
+            fail(e);
+        }
+    }
 }

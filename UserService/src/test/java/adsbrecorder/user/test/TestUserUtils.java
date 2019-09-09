@@ -1,5 +1,6 @@
 package adsbrecorder.user.test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,6 +16,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import adsbrecorder.user.UserServiceMappings;
 
 public interface TestUserUtils extends UserServiceMappings {
+
+    default Long registerUser(MockMvc mockMvc, String username, String password) throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(
+                post(USER_NEW)
+                .param("username", username)
+                .param("password", password))
+            .andExpect(status().isCreated())
+            .andReturn().getResponse();
+        JSONObject json = new JSONObject(response.getContentAsString());
+        assertNotNull(json.get("newUser"));
+        JSONObject newUser = json.getJSONObject("newUser");
+        return Long.valueOf(String.valueOf(newUser.get("userId")));
+    }
 
     default Map<String, Object> login(MockMvc mockMvc, String username, String password) throws Exception {
         final String name = "JWT-AUTH";

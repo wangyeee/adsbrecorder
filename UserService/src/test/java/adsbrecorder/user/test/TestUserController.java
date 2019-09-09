@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import adsbrecorder.user.UserServiceMappings;
 import adsbrecorder.user.controller.RoleController;
 import adsbrecorder.user.controller.UserController;
 import adsbrecorder.user.test.conf.InMemoryDBTestConfiguration;
@@ -49,7 +48,7 @@ import adsbrecorder.user.test.conf.InMemoryDBTestConfiguration;
         "adsbrecorder.user.entity"})
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = {UserController.class, RoleController.class})
-public class TestUserController implements UserServiceMappings {
+public class TestUserController implements TestUserUtils {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -284,15 +283,6 @@ public class TestUserController implements UserServiceMappings {
     }
 
     private Long registerUser(String username, String password) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(
-                post(USER_NEW)
-                .param("username", username)
-                .param("password", password))
-            .andExpect(status().isCreated())
-            .andReturn().getResponse();
-        JSONObject json = new JSONObject(response.getContentAsString());
-        assertNotNull(json.get("newUser"));
-        JSONObject newUser = json.getJSONObject("newUser");
-        return Long.valueOf(String.valueOf(newUser.get("userId")));
+        return registerUser(mockMvc, username, password);
     }
 }
