@@ -86,7 +86,14 @@ public class UserManagementController implements UserServiceMappings {
         }).collect(Collectors.toSet());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userId", user.getUserId(),
-                             "authorities", authorityService.assignAuthoritiesToUser(user, authorities)));
+                             "authorities", this.authorityService.assignAuthoritiesToUser(user, authorities)));
+    }
+
+    @GetMapping(VIEW_USER_UNASSIGNED_AUTHORITIES)
+    public ResponseEntity<Map<String, Object>> listUnassignedAuthoritiesForUser(@PathEntity(name = "user") User user) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("userId", user.getUserId(),
+                             "authoritiesAvailable", this.authorityService.findAvailableAuthorities(user)));
     }
 
     @GetMapping(VIEW_USER_UNASSIGNED_ROLES)

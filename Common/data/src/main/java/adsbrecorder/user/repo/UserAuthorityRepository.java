@@ -11,4 +11,5 @@ import adsbrecorder.user.entity.UserAuthority;
 public interface UserAuthorityRepository extends JpaRepository<UserAuthority, Long> {
 
     List<UserAuthority> findAllByUserAndAuthority(User user, Authority authority);
+    List<UserAuthority> findAllByUser(User user);
 }

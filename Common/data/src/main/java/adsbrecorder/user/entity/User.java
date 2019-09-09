@@ -64,11 +64,6 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
 
     private transient Set<UserRole> userRoles;
 
-    private transient Set<Role> roles;
-
-    @Deprecated
-    private transient Set<Authority> authorities;
-
     private transient Set<UserAuthority> directAuthorities;
 
     public User() {
@@ -80,7 +75,12 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
 
     @Override
     public UsernamePasswordAuthenticationToken toAuthenticationToken() {
-        return new UsernamePasswordAuthenticationToken(username, password, authorities);
+        return new UsernamePasswordAuthenticationToken(username, password, this.getAuthorities());
+    }
+
+    @Override
+    public boolean isValidEntity() {
+        return this.getUserId() > 0L;
     }
 
     public Long getUserId() {
@@ -133,27 +133,19 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
     }
 
     public void setDirectAuthorities(Set<UserAuthority> directAuthorities) {
-        this.directAuthorities = directAuthorities;
-        if (directAuthorities != null && directAuthorities.size() > 0) {
-            if (this.authorities == null) {
-                this.authorities = directAuthorities.stream().map(da -> da.getAuthority()).collect(Collectors.toSet());
-            } else {
-                directAuthorities.forEach(da -> this.authorities.add(da.getAuthority()));
-            }
+        if (this.directAuthorities == null) {
+            this.directAuthorities = directAuthorities;
+        } else {
+            this.directAuthorities.addAll(directAuthorities);
         }
     }
 
     public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
         if (userRoles != null && userRoles.isEmpty() == false) {
-            Set<Role> roles = userRoles.stream().map(ur -> {
-                ur.setUser(null);  // avoid infinite loop when generating json
-                return ur.getRole();
-            }).collect(Collectors.toSet());
-            this.setRoles(roles);  // TODO remove
-            ///////
             if (this.directAuthorities == null) {
                 this.directAuthorities = userRoles.stream().flatMap(ur -> {
+                    ur.setUser(null);
                     Set<Authority> newAuth = ur.getRole().getAuthorities();
                     if (newAuth != null && newAuth.isEmpty() == false) {
                         return newAuth.stream().map(auth -> {
@@ -170,6 +162,7 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
                 }).collect(Collectors.toSet());
             } else {
                 userRoles.forEach(ur -> {
+                    ur.setUser(null);
                     Set<Authority> newAuth = ur.getRole().getAuthorities();
                     if (newAuth != null && newAuth.isEmpty() == false) {
                         this.directAuthorities.addAll(newAuth.stream().map(auth -> {
@@ -189,34 +182,14 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
 
     @JsonIgnore
     public Set<Role> getRoles() {
-        return roles;
-    }
-
-    private void setRoles(Set<Role> roles) {
-        this.roles = roles;
-        if (roles != null && roles.isEmpty() == false) {
-            if (this.authorities == null) {
-                this.authorities = roles.stream().flatMap(role -> {
-                    Set<Authority> newAuth = role.getAuthorities();
-                    if (newAuth != null && newAuth.isEmpty() == false) {
-                        return role.getAuthorities().stream();
-                    }
-                    return Stream.empty();
-                }).collect(Collectors.toSet());
-            } else {
-                roles.forEach(role -> {
-                    Set<Authority> newAuth = role.getAuthorities();
-                    if (newAuth != null && newAuth.isEmpty() == false) {
-                        this.authorities.addAll(role.getAuthorities());
-                    }
-                });
-            }
-        }
+        return this.userRoles == null ? Set.of():
+            this.userRoles.stream().map(ur -> ur.getRole()).collect(Collectors.toSet());
     }
 
     @JsonIgnore
     public Set<Authority> getAuthorities() {
-        return authorities;
+        return this.directAuthorities == null ? Set.of() :
+            this.directAuthorities.stream().map(da -> da.getAuthority()).collect(Collectors.toSet());
     }
 
     @Override
@@ -271,11 +244,6 @@ public class User implements Serializable, AuthorityObject, AutoResolvableEntity
     @Override
     public String toString() {
         return "User [userId=" + userId + ", username=" + username + ", password=" + password + ", salt=" + salt
-                + ", creationDate=" + creationDate + ", roles=" + roles + "]";
-    }
-
-    @Override
-    public boolean isValidEntity() {
-        return this.getUserId() > 0L;
+                + ", creationDate=" + creationDate + "]";
     }
 }

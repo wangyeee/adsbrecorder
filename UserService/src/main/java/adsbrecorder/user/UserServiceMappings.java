@@ -13,5 +13,6 @@ public interface UserServiceMappings extends URLUtils {
     String LIST_OF_USERS = "/api/user/admin/list";
     String VIEW_USER_ROLES = "/api/user/admin/detail/{user}/roles";
     String VIEW_USER_UNASSIGNED_ROLES = "/api/user/admin/detail/{user}/unassignedroles";
+    String VIEW_USER_UNASSIGNED_AUTHORITIES = "/api/user/admin/detail/{user}/unassignedauthorities";
     String VIEW_USER_AUTHORITIES = "/api/user/admin/detail/{user}/authorities";
 }

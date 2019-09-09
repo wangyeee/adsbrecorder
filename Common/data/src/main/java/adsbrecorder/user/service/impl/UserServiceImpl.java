@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -20,6 +21,7 @@ import adsbrecorder.common.utils.HashUtils;
 import adsbrecorder.common.utils.RandomUtils;
 import adsbrecorder.common.utils.URLUtils;
 import adsbrecorder.user.entity.User;
+import adsbrecorder.user.repo.UserAuthorityRepository;
 import adsbrecorder.user.repo.UserRepository;
 import adsbrecorder.user.service.UserRoleService;
 import adsbrecorder.user.service.UserService;
@@ -30,6 +32,7 @@ import io.jsonwebtoken.security.Keys;
 public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URLUtils {
 
     private UserRepository userRepository;
+    private UserAuthorityRepository userAuthorityRepository;
     private UserRoleService userRoleService;
     private SecureRandom secureRandom;
 
@@ -42,8 +45,11 @@ public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URL
     private transient byte[] signingKey;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserRoleService userRoleService) {
+    public UserServiceImpl(UserRepository userRepository,
+            UserAuthorityRepository userAuthorityRepository,
+            UserRoleService userRoleService) {
         this.userRepository = requireNonNull(userRepository);
+        this.userAuthorityRepository = requireNonNull(userAuthorityRepository);
         this.userRoleService = requireNonNull(userRoleService);
         this.secureRandom = new SecureRandom();
     }
@@ -104,6 +110,8 @@ public class UserServiceImpl implements UserService, HashUtils, RandomUtils, URL
     @Override
     public User authorize(User user) {
         user.setUserRoles(userRoleService.getUserRoles(user));
+        user.setDirectAuthorities(userAuthorityRepository.findAllByUser(user)
+                .stream().collect(Collectors.toSet()));
         return user;
     }
 

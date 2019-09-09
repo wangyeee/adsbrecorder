@@ -11,4 +11,5 @@ public interface AuthorityService {
     Authority findById(Long authorityId);
     Authority createAuthority(Authority authority);
     Set<UserAuthority> assignAuthoritiesToUser(User user, Set<Authority> authorities);
+    Set<Authority> findAvailableAuthorities(User user);
 }
