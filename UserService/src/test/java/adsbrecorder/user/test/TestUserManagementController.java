@@ -217,7 +217,7 @@ public class TestUserManagementController implements TestUserUtils {
                     .header("Authorization", jwt)
                     .content(new JSONArray(ids).toString())
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn().getResponse();
+                .andExpect(status().isCreated()).andReturn().getResponse();
             assertNotNull(assignAuthResponse.getContentAsString());
             JSONArray newAuth = new JSONObject(assignAuthResponse.getContentAsString()).getJSONArray("authorities");
             assertTrue(newAuth.length() > 0);
