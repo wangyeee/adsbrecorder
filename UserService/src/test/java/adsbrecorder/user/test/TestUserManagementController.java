@@ -1,15 +1,21 @@
 package adsbrecorder.user.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +24,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
@@ -179,6 +186,41 @@ public class TestUserManagementController implements TestUserUtils {
                     get(VIEW_USER_UNASSIGNED_AUTHORITIES, userId).header("Authorization", jwt))
                     .andExpect(status().isOk()).andReturn().getResponse();
             assertNotNull(response.getContentAsString());
+        } catch (Exception e) {
+            fail(e);
+        }
+    }
+
+    @Test
+    public void testAssignAuthoritiesToUser() {
+        final String username = "AssignAuthoritiesToUser";
+        final String password = "AssignAuthoritiesToUser Password";
+        try {
+            final long userId = registerUser(mockMvc, username, password);
+            Map<String, Object> map = login(mockMvc, adminUsername, adminPassword);
+            final String jwt = String.valueOf(map.get("token"));
+            MockHttpServletResponse getAuthResponse = mockMvc.perform(
+                    get(VIEW_USER_UNASSIGNED_AUTHORITIES, userId).header("Authorization", jwt))
+                    .andExpect(status().isOk()).andReturn().getResponse();
+            assertNotNull(getAuthResponse.getContentAsString());
+            JSONArray unassignedAuthorities = new JSONObject(getAuthResponse.getContentAsString()).getJSONArray("authoritiesAvailable");
+            List<Long> ids = unassignedAuthorities.toList().stream().flatMap(auth0 -> {
+                Map<?, ?> auth1 = (Map<?, ?>) auth0;
+                if ("RUN_SIMPLE_DAILY_SUMMARY_REPORT".equals(auth1.get("authority")))
+                    return Stream.of(Long.valueOf(String.valueOf(auth1.get("authorityId"))));
+                if ("VIEW_REPORT_METADATA".equals(auth1.get("authority")))
+                    return Stream.of(Long.valueOf(String.valueOf(auth1.get("authorityId"))));
+                return Stream.empty();
+            }).collect(Collectors.toList());
+            MockHttpServletResponse assignAuthResponse = mockMvc.perform(
+                    post(VIEW_USER_AUTHORITIES, userId)
+                    .header("Authorization", jwt)
+                    .content(new JSONArray(ids).toString())
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn().getResponse();
+            assertNotNull(assignAuthResponse.getContentAsString());
+            JSONArray newAuth = new JSONObject(assignAuthResponse.getContentAsString()).getJSONArray("authorities");
+            assertTrue(newAuth.length() > 0);
         } catch (Exception e) {
             fail(e);
         }
