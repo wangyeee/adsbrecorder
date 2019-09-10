@@ -84,7 +84,7 @@ public class UserManagementController implements UserServiceMappings {
                 return Stream.empty();
             return Stream.of(auth);
         }).collect(Collectors.toSet());
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("userId", user.getUserId(),
                              "authorities", this.authorityService.assignAuthoritiesToUser(user, authorities)));
     }
