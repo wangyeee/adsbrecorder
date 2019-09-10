@@ -24,7 +24,6 @@ public abstract class TokenAuthenticationAdapter extends WebSecurityConfigurerAd
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> {
-                e.printStackTrace();
                 rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             })
             .and()
