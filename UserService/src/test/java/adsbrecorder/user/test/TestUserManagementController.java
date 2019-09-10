@@ -29,6 +29,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import adsbrecorder.user.controller.UserController;
 import adsbrecorder.user.controller.UserManagementController;
+import adsbrecorder.user.service.AuthorityService;
+import adsbrecorder.user.service.RoleService;
+import adsbrecorder.user.service.impl.AuthorityServiceImpl;
+import adsbrecorder.user.service.impl.RoleServiceImpl;
 import adsbrecorder.user.test.conf.InMemoryDBTestConfiguration;
 
 @EnableJpaRepositories(basePackages = "adsbrecorder.user.repo")
@@ -51,6 +55,12 @@ public class TestUserManagementController implements TestUserUtils {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
+    private AuthorityService authorityService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
     private FilterChainProxy filterChainProxy;
 
     private MockMvc mockMvc;
@@ -62,6 +72,9 @@ public class TestUserManagementController implements TestUserUtils {
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
                 .addFilter(filterChainProxy).build();
+        // reload data created in Init.loadDefaultUserRoles()
+        ((AuthorityServiceImpl) this.authorityService).cacheAllAuthorities();
+        ((RoleServiceImpl) this.roleService).cacheAllRoles();
     }
 
     @Test
