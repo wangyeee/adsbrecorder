@@ -11,16 +11,26 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QGridLayout,
 
 class PropScanner(QObject):
 
-    def __init__(self, folder, parent = None):
-        super().__init__(parent)
+    def __init__(self, folder):
         self.folder = folder
         self.propsFileList = []
+        self.excludePath = [
+            os.path.sep + 'target' + os.path.sep + 'classes' + os.path.sep,
+            os.path.sep + 'target' + os.path.sep + 'test-classes' + os.path.sep
+        ]
 
     def scan(self):
         pathList = Path(self.folder).glob('**/*.properties.template')
         for path in pathList:
             pathStr = str(path)
-            self.propsFileList.append(pathStr)
+            if self.includePath(pathStr):
+                self.propsFileList.append(pathStr)
+
+    def includePath(self, path):
+        for excl in self.excludePath:
+            if excl in path:
+                return False
+        return True
 
 class PropertyTemplate(QObject):
 
