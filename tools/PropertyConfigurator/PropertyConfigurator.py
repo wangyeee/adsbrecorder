@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, json
 from pathlib import Path
 
 from jproperties import Properties
@@ -156,6 +156,7 @@ class ScanResultWidget(QWidget):
         self.layout().addWidget(self.messageLabel)
         self.layout().addWidget(self.propsWidget)
         self.scanner = None
+        self.scanCompleted = False
 
     def scan(self, path):
         if self.scanner == None or self.scanner.running == False:
@@ -171,6 +172,7 @@ class ScanResultWidget(QWidget):
 
     def fetchScanFullResult(self):
         self.messageLabel.setText(self.messageLabel.text() + ', complete.')
+        self.scanCompleted = True
 
     def generatePropertiesFiles(self):
         if self.scanner == None or self.scanner.running == True:
@@ -193,6 +195,32 @@ class ScanResultWidget(QWidget):
             dftProps.generatePropertiesFile()
         QMessageBox.information(self, 'Complete', 'Properties file generated successfully.')
 
+    def getManualConfigParameters(self):
+        if self.scanner == None or self.scanner.running == True:
+            return []
+        manualConfigs = []
+        rowNumber = 0
+        workingTmpl = None
+        workingConfig = {}
+        while rowNumber < self.propsWidget.table.rowCount():
+            name = self.propsWidget.table.item(rowNumber, 0).text()
+            if (name.startswith('Properties file:')):
+                if workingTmpl != None:
+                    configItem = {
+                        'file': workingTmpl.path[0:len(workingTmpl.path)-len('.template')],
+                        'properties': workingConfig
+                    }
+                    manualConfigs.append(configItem)
+                    workingConfig = {}
+                workingTmpl = self.scanner.templateList[name[len('Properties file: '): len(name)]]
+                rowNumber += 1 # Skip header "Name = Value"
+            else:
+                value = self.propsWidget.table.item(rowNumber, 1).text()
+                # print('{}={}'.format(name, value))
+                workingConfig[name] = value
+            rowNumber += 1
+        return manualConfigs
+
 class PropertyConfigurator(QMainWindow):
 
     def __init__(self, parent = None):
@@ -210,15 +238,28 @@ class PropertyConfigurator(QMainWindow):
         self.closeButton = QPushButton('Close')
         self.scanButton = QPushButton('Scan')
         self.saveButton = QPushButton('Save')
+        self.saveConfigButton = QPushButton('Save As Config')
         self.actionButtonWidget.layout().addWidget(self.closeButton)
+        self.actionButtonWidget.layout().addWidget(self.saveConfigButton)
         self.actionButtonWidget.layout().addWidget(self.saveButton)
         self.actionButtonWidget.layout().addWidget(self.scanButton)
+        self.saveConfigButton.clicked.connect(self.__saveManualConfigFile)
         self.closeButton.clicked.connect(self.close)
         self.saveButton.clicked.connect(self.scanResult.generatePropertiesFiles)
         self.scanButton.clicked.connect(lambda: self.scanResult.scan(self.scanPathSelector.getRootPath()))
         self.window.layout().addWidget(self.actionButtonWidget)
         self.setCentralWidget(self.window)
         self.resize(1280, 800)
+
+    def __saveManualConfigFile(self):
+        if self.scanResult.scanCompleted == False:
+            QMessageBox.information(self, 'Info', 'Please scan confir template files before save as manual config file.')
+        else:
+            destConfig = QFileDialog.getSaveFileName(self, 'Save as manual config file', 'manual_config.json')
+            if destConfig and len(destConfig[0]) > 0:
+                cfg = self.scanResult.getManualConfigParameters()
+                with open(destConfig[0], 'wb') as destCfg:
+                    destCfg.write(json.dumps(cfg, indent=4).encode('utf-8'))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
