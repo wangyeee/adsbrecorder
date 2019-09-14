@@ -56,7 +56,7 @@ class PropertyTemplate:
                 changemeArray = val.split('_')
                 if len(changemeArray) == 1:
                     params[key] = '' if key not in self.existingProps else self.existingProps[key]
-                elif key in self.existingProps:
+                elif key in self.existingProps and len(self.existingProps[key]) > 0:
                     params[key] = self.existingProps[key]
                 else:
                     cmd = changemeArray[1]
@@ -92,7 +92,7 @@ def scan(scanPath):
         lst = q.getParametersNotSet()
         notSet = {}
         for l in lst:
-            notSet[l] = ''
+            notSet[l] = lst[l]
         if len(notSet) > 0:
             template = {}
             template['file'] = q.getOutputPropertiesFileName()
