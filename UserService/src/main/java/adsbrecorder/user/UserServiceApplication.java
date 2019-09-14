@@ -31,20 +31,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "misc.properties"})
 public class UserServiceApplication extends SpringBootServletInitializer {
     public static void main(String[] args) {
-        readhosts();
         SpringApplication.run(UserServiceApplication.class, args);
-    }
-    static void readhosts() {
-        try {
-            java.io.InputStream in = new java.io.FileInputStream("D:\\docs\\workplace\\eclipse\\java_dev\\adsbrecorder\\tools\\PropertyConfigurator\\requirements.txt");
-            java.util.Scanner sn = new java.util.Scanner(in);
-            while (sn.hasNextLine()) {
-                System.err.println(sn.nextLine());
-            }
-            sn.close();
-            in.close();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
     }
 }
