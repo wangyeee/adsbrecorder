@@ -4,5 +4,3 @@ adsbrecorder.report.data_root=CHANGEME
 adsbrecorder.report.output_root=CHANGEME
 adsbrecorder.report.tmpl_root=CHANGEME
 adsbrecorder.report.fop.conf=CHANGEME
-
-debug=true
