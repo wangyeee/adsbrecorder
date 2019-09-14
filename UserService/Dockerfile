@@ -1,6 +1,8 @@
 FROM openjdk:12
 
 VOLUME /tmp
-EXPOSE 8082
-ADD /target/user-service-1.0.0.jar app.jar
+ARG SERVER_PORT
+EXPOSE ${SERVER_PORT}
+ARG JAR_FILE
+ADD /target/${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar","app.jar"]
