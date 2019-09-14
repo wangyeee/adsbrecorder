@@ -1,4 +1,4 @@
-import os, sys, json
+import os, sys, json, secrets, base64
 from pathlib import Path
 
 from jproperties import Properties
@@ -34,6 +34,8 @@ class PropScanner(QObject):
 
 class PropertyTemplate(QObject):
 
+    CHANGEME_VALUE_PREFIX = 'CHANGEME'
+
     def __init__(self, path, parent = None):
         super().__init__(parent)
         self.config = Properties()
@@ -52,14 +54,26 @@ class PropertyTemplate(QObject):
                 self.existingProps.update(existConfig.properties)
         except FileNotFoundError:
             for key, val in self.config.properties.items():
-                if val != 'CHANGEME':
+                if val.startswith(PropertyTemplate.CHANGEME_VALUE_PREFIX) == False:
                     self.existingProps[key] = val
 
     def getParametersNotSet(self):
         params = {}
         for key, val in self.config.properties.items():
-            if val == 'CHANGEME':
-                params[key] = '' if key not in self.existingProps else self.existingProps[key]
+            if val.startswith(PropertyTemplate.CHANGEME_VALUE_PREFIX):
+                changemeArray = val.split('_')
+                if len(changemeArray) == 1:
+                    params[key] = '' if key not in self.existingProps else self.existingProps[key]
+                elif key in self.existingProps:
+                    params[key] = self.existingProps[key]
+                else:
+                    cmd = changemeArray[1]
+                    if cmd.startswith('RAND'):
+                        try:
+                            length = int(cmd[len('RAND'): len(cmd)])
+                            params[key] = base64.b64encode(secrets.token_bytes(length)).decode('utf-8')
+                        except ValueError:
+                            params[key] = ''
         return params
 
     def updateExistingProperty(self, key, value):
