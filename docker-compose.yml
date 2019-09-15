@@ -15,6 +15,20 @@ services:
     networks:
       - backend
 
+  client-service:
+    image: adsbrecorder/client-service:1.0.0
+    ports:
+      - "7081:8081"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/${MARIADB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
+    depends_on:
+      - mariadb
+    networks:
+      - backend
+
   report-service:
     image: adsbrecorder/report-service:1.0.0
     ports:
