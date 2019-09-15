@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  user-service:
+    image: adsbrecorder/user-service:1.0.0
+    ports:
+      - "7082:8082"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/${MARIADB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
+    depends_on:
+      - mariadb
+    networks:
+      - backend
+
+  report-service:
+    image: adsbrecorder/report-service:1.0.0
+    ports:
+      - "7086:8086"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/${MARIADB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
+    depends_on:
+      - mariadb
+      - mongodb
+    networks:
+      - backend
+
+  mariadb:
+    image: mariadb:latest
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MARIADB_NAME}
+      MYSQL_USER: ${MARIADB_USERNAME}
+      MYSQL_PASSWORD: ${MARIADB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    restart: always
+    networks:
+      - backend
+
+volumes:
+  db-data:
+
+networks:
+  backend:
