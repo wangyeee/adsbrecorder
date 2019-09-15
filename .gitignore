@@ -17,6 +17,8 @@ buildNumber.properties
 node_modules/*
 src/main/resources/static/built/*
 
+.env
+
 application.properties
 mariadb.properties
 mongodb.properties
