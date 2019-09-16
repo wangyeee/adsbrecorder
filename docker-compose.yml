@@ -44,6 +44,21 @@ services:
     networks:
       - backend
 
+  data-service:
+    image: adsbrecorder/data-service:1.0.0
+    ports:
+      - "7084:8084"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/${MARIADB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
+    depends_on:
+      - mariadb
+      - mongodb
+    networks:
+      - backend
+
   receiver-service:
     image: adsbrecorder/receiver-service:1.0.0
     ports:
@@ -55,6 +70,15 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
     depends_on:
       - mariadb
+      - mongodb
+      - kafka
+    networks:
+      - backend
+
+  data-interleaving-service:
+    image: adsbrecorder/data-interleaving-service:1.0.0
+    restart: always
+    depends_on:
       - mongodb
       - kafka
     networks:
@@ -96,6 +120,8 @@ services:
     ports:
       - "27017:27017"
     restart: always
+    volumes:
+      - db-data:/var/lib/mongo
     networks:
       - backend
 
