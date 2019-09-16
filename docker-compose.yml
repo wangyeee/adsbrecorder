@@ -111,7 +111,7 @@ services:
       MYSQL_PASSWORD: ${MARIADB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
     volumes:
-      - db-data:/var/lib/mysql
+      - sql_data:/var/lib/mysql
     networks:
       - backend
 
@@ -121,7 +121,7 @@ services:
       - "27017:27017"
     restart: always
     volumes:
-      - db-data:/var/lib/mongo
+      - mongo_data:/var/lib/mongo
     networks:
       - backend
 
@@ -151,7 +151,10 @@ services:
       - backend
 
 volumes:
-  db-data:
+  sql_data:
+    driver: local
+  mongo_data:
+    driver: local
   zookeeper_data:
     driver: local
   kafka_data:
