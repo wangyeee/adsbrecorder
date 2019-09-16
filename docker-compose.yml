@@ -44,6 +44,38 @@ services:
     networks:
       - backend
 
+  receiver-service:
+    image: adsbrecorder/receiver-service:1.0.0
+    ports:
+      - "7083:8083"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/${MARIADB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
+    depends_on:
+      - mariadb
+      - mongodb
+      - kafka
+    networks:
+      - backend
+
+  realtime-service:
+    image: adsbrecorder/realtime-service:1.0.0
+    ports:
+      - "7085:8085"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/${MARIADB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
+    depends_on:
+      - mariadb
+      - mongodb
+      - kafka
+    networks:
+      - backend
+
   mariadb:
     image: mariadb:latest
     ports:
@@ -67,8 +99,37 @@ services:
     networks:
       - backend
 
+  zookeeper:
+    image: 'bitnami/zookeeper:3'
+    ports:
+      - '2181:2181'
+    volumes:
+      - 'zookeeper_data:/bitnami'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - backend
+
+  kafka:
+    image: 'bitnami/kafka:2'
+    ports:
+      - '9092:9092'
+    volumes:
+      - 'kafka_data:/bitnami'
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    networks:
+      - backend
+
 volumes:
   db-data:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
 
 networks:
   backend:
