@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.annotation.PostConstruct;
 import javax.xml.transform.Result;
@@ -53,11 +55,17 @@ public class RenderServiceXSLFOImpl implements RenderService {
     @PostConstruct
     public void initFopFactory() {
         try {
+            // try to load external fop configuration first
             fopFactory = FopFactory.newInstance(new File(fopFactoryConfigurationFile));
-            transformerFactory = new net.sf.saxon.TransformerFactoryImpl();
         } catch (SAXException | IOException e) {
-            fopFactory = null;
+            try {
+                // if falied, then load default configs
+                fopFactory = FopFactory.newInstance(new URI("."));
+            } catch (URISyntaxException e1) {
+                fopFactory = null;
+            }
         }
+        transformerFactory = new net.sf.saxon.TransformerFactoryImpl();
     }
 
     @Async

@@ -50,7 +50,6 @@ public abstract class TokenAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception e) {
-            e.printStackTrace(); // TODO syserr
             SecurityContextHolder.clearContext();
         }
     }

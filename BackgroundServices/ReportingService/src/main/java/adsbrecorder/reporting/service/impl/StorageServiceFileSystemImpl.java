@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import adsbrecorder.common.utils.NonSecureRandomUtils;
@@ -82,7 +83,10 @@ public class StorageServiceFileSystemImpl implements StorageService, NonSecureRa
     @Override
     public InputStream asInputStream(String filename) throws IOException {
         if (filename.toLowerCase().endsWith(".xsl")) {
-            return new FileInputStream(new File(templateRoot, filename));
+            File xsl = new File(templateRoot, filename);
+            if (xsl.exists())
+                return new FileInputStream(xsl);
+            return new ClassPathResource(filename).getInputStream();
         }
         if (filename.toLowerCase().endsWith(".xml")) {
             return new FileInputStream(new File(dataRoot, filename));
