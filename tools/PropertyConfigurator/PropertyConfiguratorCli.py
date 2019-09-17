@@ -25,6 +25,23 @@ class PropScanner:
                 return False
         return True
 
+class DotEnv:
+
+    def __init__(self):
+        self.envMappings = {
+            'spring.datasource.username': 'MARIADB_USERNAME',
+            'spring.datasource.password': 'MARIADB_PASSWORD'
+        }
+        self.envs = {
+            'MARIADB_ROOT_PASSWORD': secrets.token_hex(32),
+            'MARIADB_NAME': 'adsbrecorder'
+        }
+
+    def updateProperties(self, props):
+        for k, v in props.items():
+            if k in self.envMappings:
+                self.envs[self.envMappings[k]] = v
+
 class PropertyTemplate:
 
     CHANGEME_VALUE_PREFIX = 'CHANGEME'
@@ -108,10 +125,17 @@ def scan(scanPath):
 def generateFromManualConfig(configPath):
     with open(configPath, 'rb') as manCfg:
         configList = json.load(manCfg)
+        dotEnv = DotEnv()
         for config in configList:
             tmplCfg = PropertyTemplate(config['file'] + '.template')
             tmplCfg.updateExistingProperties(config['properties'])
+            dotEnv.updateProperties(config['properties'])
             tmplCfg.generatePropertiesFile()
+        print('Random MariaDB root password:', dotEnv.envs['MARIADB_ROOT_PASSWORD'])
+        p = Properties()
+        p.properties.update(dotEnv.envs)
+        with open(os.path.dirname(configPath) + os.path.sep + '.env', 'wb') as f:
+            p.store(f, encoding='utf-8')
 
 def main():
     srcPath = os.path.dirname(os.path.realpath(__file__))
