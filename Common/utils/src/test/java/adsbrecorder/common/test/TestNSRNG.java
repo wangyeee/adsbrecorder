@@ -16,7 +16,6 @@ public class TestNSRNG implements NonSecureRandomUtils {
         length.forEach(l -> {
             String name = nextFilename(l);
             assertEquals(l.intValue(), name.length());
-            System.err.println("Random name: " + name);
         });
     }
 
@@ -26,7 +25,6 @@ public class TestNSRNG implements NonSecureRandomUtils {
         length.forEach(l -> {
             String name = nextFilename(l, ".pdf");
             assertEquals(l.intValue() + 4, name.length());
-            System.err.println("Random name: " + name);
         });
     }
 
@@ -36,7 +34,6 @@ public class TestNSRNG implements NonSecureRandomUtils {
         length.forEach(l -> {
             String name = nextFilename(l, "pdf");
             assertEquals(l.intValue() + 4, name.length());
-            System.err.println("Random name: " + name);
         });
     }
 }
