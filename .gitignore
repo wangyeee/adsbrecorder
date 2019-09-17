@@ -28,3 +28,4 @@ userauth.properties
 misc.properties
 
 ADSBClientConfig.json
+manual_config.json
