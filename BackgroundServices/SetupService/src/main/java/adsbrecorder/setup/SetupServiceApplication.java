@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableAutoConfiguration
 @ComponentScan(basePackages = {
         "adsbrecorder.setup",
+        "adsbrecorder.setup.service",
         "adsbrecorder.user.service"})
 @EntityScan(basePackages = {
         "adsbrecorder.user.entity"})
