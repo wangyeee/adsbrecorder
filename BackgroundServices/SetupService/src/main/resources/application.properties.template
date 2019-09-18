@@ -1,0 +1,4 @@
+server.port=8087
+
+adsbrecorder.userservice.default_roles=FEEDER
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
