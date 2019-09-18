@@ -11,5 +11,6 @@
   <modules>
     <module>DataInterleavingService</module>
     <module>ReportingService</module>
+    <module>SetupService</module>
   </modules>
 </project>
